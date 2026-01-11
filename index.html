@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GAANYOGI | Elite Travel Concierge</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Leaflet CSS & JS (For Maps) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Firebase SDKs (Compat versions) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Manrope', 'sans-serif'], serif: ['Playfair Display', 'serif'] },
+                    colors: {
+                        cream: '#FDFBF7',    // Light Premium Background
+                        emerald: {
+                            900: '#022c22',  // Dark Text / Headers
+                            800: '#064e3b',
+                            100: '#d1fae5'
+                        },
+                        gold: { 
+                            400: '#fbbf24', 
+                            500: '#d97706',  // Premium Accent
+                            600: '#b45309' 
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.8s ease-out forwards',
+                        'slide-up': 'slideUp 0.6s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                        slideUp: { '0%': { transform: 'translateY(30px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #FDFBF7;
+            color: #022c22;
+            font-family: 'Manrope', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Light Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Map styling */
+        #map { height: 100%; width: 100%; z-index: 0; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #d97706; border-radius: 3px; }
+        
+        /* Hide scrollbar for mobile feel but allow scroll */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .loader {
+            border: 3px solid rgba(217, 119, 6, 0.2);
+            border-radius: 50%;
+            border-top: 3px solid #d97706;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col overflow-x-hidden bg-cream">
+
+    <!-- Navigation -->
+    <nav class="glass sticky top-0 z-50 transition-all duration-300">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="router.navigate('home')">
+                <div class="w-10 h-10 rounded-full bg-emerald-900 flex items-center justify-center text-gold-500 font-serif text-xl shadow-lg">
+                    G
+                </div>
+                <div>
+                    <h1 class="text-xl font-serif font-bold tracking-widest text-emerald-900">GAANYOGI</h1>
+                    <p class="text-[9px] text-gold-600 font-bold uppercase tracking-[0.2em]">Elite Travel Concierge</p>
+                </div>
+            </div>
+            
+            <div class="hidden md:flex gap-8 text-sm font-semibold text-emerald-800">
+                <button onclick="router.navigate('home')" class="hover:text-gold-600 transition tracking-wide py-2 border-b-2 border-transparent hover:border-gold-500">Concierge</button>
+                <button onclick="router.navigate('tours')" class="hover:text-gold-600 transition tracking-wide py-2 border-b-2 border-transparent hover:border-gold-500">Luxury Tours</button>
+                <button onclick="router.navigate('rides')" class="hover:text-gold-600 transition tracking-wide py-2 border-b-2 border-transparent hover:border-gold-500">Book Ride</button>
+                <button onclick="router.navigate('admin')" class="hover:text-gold-600 transition tracking-wide py-2 border-b-2 border-transparent hover:border-gold-500">Admin</button>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div id="user-status" class="text-xs text-emerald-600 font-bold hidden md:block bg-emerald-100 px-3 py-1 rounded-full"></div>
+                <button onclick="router.navigate('rides')" class="hidden md:block bg-emerald-900 text-white px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-gold-600 transition shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5">
+                    <i class="fa-solid fa-car-side mr-2"></i>Chauffeur
+                </button>
+                <button onclick="toggleMobileMenu()" class="md:hidden text-emerald-900 text-2xl p-2">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white/95 backdrop-blur-xl border-t border-gray-100 p-6 flex flex-col gap-6 shadow-xl absolute w-full z-40 transition-all duration-300">
+             <button onclick="router.navigate('home'); toggleMobileMenu()" class="text-left text-emerald-900 font-bold py-2 text-lg border-b border-gray-100">Home</button>
+             <button onclick="router.navigate('tours'); toggleMobileMenu()" class="text-left text-emerald-900 font-bold py-2 text-lg border-b border-gray-100">Luxury Tours</button>
+             <button onclick="router.navigate('rides'); toggleMobileMenu()" class="text-left text-emerald-900 font-bold py-2 text-lg border-b border-gray-100">Book Ride</button>
+             <button onclick="router.navigate('admin'); toggleMobileMenu()" class="text-left text-emerald-900 font-bold py-2 text-lg">Admin Access</button>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main id="app-root" class="flex-grow relative"></main>
+
+    <!-- Footer -->
+    <footer class="bg-emerald-900 text-white py-12 mt-auto">
+        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div>
+                <h3 class="font-serif text-2xl font-bold mb-4 text-gold-500">GAANYOGI</h3>
+                <p class="text-gray-300 text-sm leading-relaxed max-w-xs">Secure Journeys, Eternal Memories. We craft premium travel experiences and smart mobility solutions across India's finest landscapes.</p>
+            </div>
+            <div>
+                <h3 class="font-serif text-lg font-bold mb-4 text-white">Concierge Desk</h3>
+                <p class="text-gray-300 text-sm mb-3 flex items-center"><i class="fa-brands fa-whatsapp mr-3 text-gold-500 text-lg"></i>+91 8080062440</p>
+                <p class="text-gray-300 text-sm flex items-center"><i class="fa-solid fa-envelope mr-3 text-gold-500 text-lg"></i>bookings@gaanyogi.in</p>
+            </div>
+            <div>
+                <h3 class="font-serif text-lg font-bold mb-4 text-white">Connect</h3>
+                <div class="flex gap-4 text-xl text-gray-400">
+                    <i class="fa-brands fa-instagram hover:text-gold-500 cursor-pointer transition transform hover:scale-110"></i>
+                    <i class="fa-brands fa-facebook hover:text-gold-500 cursor-pointer transition transform hover:scale-110"></i>
+                    <i class="fa-brands fa-twitter hover:text-gold-500 cursor-pointer transition transform hover:scale-110"></i>
+                </div>
+            </div>
+        </div>
+        <div class="text-center text-gray-500 text-[10px] uppercase tracking-widest mt-12 border-t border-white/10 pt-8">
+            &copy; 2026 GAANYOGI Elite Travel. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- AI Concierge Widget -->
+    <div class="chat-widget fixed bottom-6 right-6 z-50">
+        <div id="chat-window" class="hidden bg-white w-80 h-[450px] rounded-2xl shadow-2xl flex flex-col mb-4 overflow-hidden border border-gray-100">
+            <div class="bg-emerald-900 p-4 text-white flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-gold-500 border border-white/20">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-sm font-serif">Yogi</p>
+                        <p class="text-[10px] opacity-80 uppercase tracking-wide">Concierge AI</p>
+                    </div>
+                </div>
+                <button onclick="toggleChat()" class="hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto bg-gray-50 text-xs space-y-3 custom-scrollbar">
+                <div class="flex justify-start animate-slide-up"><div class="bg-white p-3 rounded-2xl rounded-tl-none border border-gray-200 shadow-sm max-w-[85%] text-emerald-900">Namaste! I am Yogi. How can I assist with your journey today?</div></div>
+            </div>
+            <div class="p-3 bg-white border-t border-gray-100 flex gap-2">
+                <input type="text" id="chat-input" placeholder="Ask about tours..." class="flex-1 bg-gray-100 border-transparent rounded-xl px-4 py-2 text-xs text-emerald-900 focus:outline-none focus:bg-white focus:ring-1 focus:ring-gold-500 placeholder:text-gray-400 transition">
+                <button onclick="handleChatSend()" class="bg-emerald-900 text-white w-9 h-9 rounded-xl flex items-center justify-center hover:bg-gold-600 transition shadow-lg"><i class="fa-solid fa-paper-plane text-xs"></i></button>
+            </div>
+        </div>
+        <button onclick="toggleChat()" class="bg-gradient-to-r from-emerald-900 to-emerald-800 text-white w-16 h-16 rounded-full shadow-xl shadow-emerald-900/30 flex items-center justify-center hover:scale-105 transition-transform border-2 border-white">
+            <i class="fa-solid fa-comment-dots text-2xl"></i>
+        </button>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-24 right-4 md:right-6 z-[70] flex flex-col gap-3 pointer-events-none w-auto max-w-[300px]"></div>
+
+    <!-- Booking Modal Container -->
+    <div id="modal-container"></div>
+
+    <script type="module">
+        /*******************************************************
+         * CONFIGURATION
+         *******************************************************/
+        const apiKey = ""; 
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'gaanyogi-default';
+        const firebaseConfig = JSON.parse(__firebase_config);
+        
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const state = {
+            user: null,
+            bookings: [],
+            currentTour: null,
+            map: null,
+            isAdminVerified: false,
+            ride: {
+                step: 'INPUT',
+                pickup: '',
+                drop: '',
+                distance: 0,
+                loading: false,
+                selectedVehicle: null,
+                fixedPrice: null 
+            }
+        };
+
+        // --- DATA ---
+        const RIDE_OFFERS = [
+            { id: 'off1', from: 'Mumbai Airport', to: 'Lonavala', price: 2999, img: 'https://images.unsplash.com/photo-1596739956461-8f5539d89953?q=80&w=600&auto=format&fit=crop', vehicle: 'Sedan Prime' },
+            { id: 'off2', from: 'Pune', to: 'Shirdi', price: 3499, img: 'https://images.unsplash.com/photo-1563293887-827c7d1e8476?q=80&w=600&auto=format&fit=crop', vehicle: 'SUV Comfort' },
+            { id: 'off3', from: 'Bangalore', to: 'Mysore', price: 3999, img: 'https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?q=80&w=600&auto=format&fit=crop', vehicle: 'Innova Crysta' },
+            { id: 'off4', from: 'Mumbai', to: 'Pune', price: 2499, img: 'https://images.unsplash.com/photo-1566552881560-0be862a7c445?q=80&w=600&auto=format&fit=crop', vehicle: 'Sedan Prime' }
+        ];
+
+        const TOURS = [
+            { id: 't001', title: 'Mystical Hampi', region: 'Karnataka', duration: '3 Days', price: 18500, rating: 4.8, image: 'https://images.unsplash.com/photo-1582555490422-9252c7b20536?q=80&w=800&auto=format&fit=crop', desc: 'Ancient ruins of Vijayanagara empire.', highlights: ['Coracle Ride', 'Sunset Point', 'Cave Temples'] },
+            { id: 't002', title: 'Konkan Bliss', region: 'Maharashtra', duration: '4 Days', price: 22000, rating: 4.9, image: 'https://images.unsplash.com/photo-1571406452293-c9183b38148b?q=80&w=800&auto=format&fit=crop', desc: 'Pristine beaches and scuba diving.', highlights: ['Scuba Diving', 'Fort Visit', 'Beach Bonfire'] },
+            { id: 't003', title: 'Coorg Hills', region: 'Karnataka', duration: '3 Days', price: 15500, rating: 4.7, image: 'https://images.unsplash.com/photo-1596176530529-78163a4f7af2?q=80&w=800&auto=format&fit=crop', desc: 'Coffee plantations and misty hills.', highlights: ['Coffee Tasting', 'Abbey Falls', 'Elephants'] }
+        ];
+
+        const VEHICLES = [
+            { id: 'v1', name: 'Gaanyogi Prime', type: 'Sedan (AC)', seats: 4, rate: 14, img: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/128413/ertiga-exterior-right-front-three-quarter-5.jpeg?isig=0' },
+            { id: 'v2', name: 'Gaanyogi XL', type: 'SUV (AC)', seats: 6, rate: 18, img: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/144681/trax-cruiser-exterior-right-front-three-quarter.jpeg?isig=0' },
+            { id: 'v3', name: 'Gaanyogi Lux', type: 'Luxury', seats: 4, rate: 35, img: 'https://5.imimg.com/data5/SELLER/Default/2022/9/MQ/OA/WO/3622432/force-trax-cruiser-12-str-ac-500x500.jpg' }
+        ];
+
+        /*******************************************************
+         * LOGIC
+         *******************************************************/
+        async function initAuth() {
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await auth.signInWithCustomToken(__initial_auth_token);
+            else await auth.signInAnonymously();
+            auth.onAuthStateChanged(u => {
+                state.user = u;
+                if(u) document.getElementById('user-status').innerHTML = `<i class="fa-solid fa-user-circle mr-1"></i> Guest`;
+            });
+        }
+
+        async function callGemini(prompt, system) {
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], systemInstruction: { parts: [{ text: system }] } })
+                });
+                const data = await res.json();
+                return data.candidates[0].content.parts[0].text;
+            } catch(e) { return null; }
+        }
+
+        async function estimateRide() {
+            const p = document.getElementById('pickup-input').value;
+            const d = document.getElementById('drop-input').value;
+            if(!p || !d) return showToast("Enter locations", "error");
+
+            state.ride.loading = true;
+            state.ride.pickup = p;
+            state.ride.drop = d;
+            state.ride.fixedPrice = null; // Reset fixed price
+            renderRides(document.getElementById('app-root'));
+
+            const prompt = `Calculate driving distance in km between ${p} and ${d}. Return ONLY the number.`;
+            const res = await callGemini(prompt, "Number only.");
+            let dist = parseFloat(res?.replace(/[^0-9.]/g, '') || (Math.random()*50+10));
+            
+            state.ride.distance = dist;
+            state.ride.step = 'LIST';
+            state.ride.loading = false;
+            renderRides(document.getElementById('app-root'));
+        }
+
+        function bookOffer(offerId) {
+            const offer = RIDE_OFFERS.find(o => o.id === offerId);
+            state.ride.selectedVehicle = { name: offer.vehicle, rate: 0, img: VEHICLES[0].img, seats: 4 }; // Dummy vehicle for modal
+            state.ride.pickup = offer.from;
+            state.ride.drop = offer.to;
+            state.ride.distance = 0; // Not needed for fixed price
+            state.ride.fixedPrice = offer.price;
+            renderBookingModal();
+        }
+
+        function openBookingModal(vehicleId) {
+            state.ride.selectedVehicle = VEHICLES.find(v => v.id === vehicleId);
+            state.ride.fixedPrice = null;
+            renderBookingModal();
+        }
+
+        function closeBookingModal() {
+            document.getElementById('modal-container').innerHTML = '';
+            state.ride.selectedVehicle = null;
+        }
+
+        async function submitRideBooking(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.innerHTML = '<div class="loader w-4 h-4 inline-block"></div>';
+            
+            const form = e.target;
+            const fare = state.ride.fixedPrice || Math.round(state.ride.distance * state.ride.selectedVehicle.rate);
+            
+            const booking = {
+                type: 'RIDE',
+                customerName: form.customerName.value,
+                phone: form.customerPhone.value,
+                passengers: form.passengers.value,
+                pickup: state.ride.pickup,
+                drop: state.ride.drop,
+                vehicle: state.ride.selectedVehicle.name,
+                amount: fare,
+                status: 'REQUESTED',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                userId: state.user.uid
+            };
+
+            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('rides').add(booking);
+            
+            // Short description as requested
+            const msg = `*New Ride Request*
+Name: ${booking.customerName}
+Mobile: ${booking.phone}
+Pickup: ${booking.pickup}
+Drop: ${booking.drop}
+Price: ₹${fare}
+Seats: ${booking.passengers}
+Vehicle: ${booking.vehicle}`;
+
+            // Send to specified number
+            window.open(`https://wa.me/918080062440?text=${encodeURIComponent(msg)}`, '_blank');
+            
+            showToast("Request Sent to WhatsApp!", "success");
+            closeBookingModal();
+        }
+
+        /*******************************************************
+         * RENDERERS
+         *******************************************************/
+        const router = {
+            navigate: (route, params) => {
+                const root = document.getElementById('app-root');
+                window.scrollTo(0,0);
+                if(route === 'home') renderHome(root);
+                else if(route === 'tours') renderTours(root);
+                else if(route === 'tour-detail') renderTourDetail(root, params);
+                else if(route === 'booking') renderBooking(root, params);
+                else if(route === 'rides') renderRides(root);
+                else if(route === 'admin') renderAdmin(root);
+            }
+        };
+
+        function renderHome(container) {
+            container.innerHTML = `
+                <!-- Hero -->
+                <div class="relative h-[80vh] md:h-[85vh] w-full overflow-hidden animate-fade-in">
+                    <img src="https://images.unsplash.com/photo-1545232979-8bf68ee0523f?q=80&w=1600" class="absolute inset-0 w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-r from-white/90 via-white/60 to-transparent"></div>
+                    
+                    <div class="absolute inset-0 flex flex-col justify-center px-6 md:px-24 container mx-auto">
+                        <div class="max-w-2xl animate-slide-up mt-10 md:mt-0">
+                            <span class="text-gold-600 font-bold tracking-[0.3em] text-[10px] md:text-xs uppercase mb-4 block">Premium Chauffeur Services</span>
+                            <h1 class="font-serif text-4xl md:text-7xl text-emerald-900 mb-4 md:mb-6 leading-tight">Elevate Your <br><span class="text-gold-500 italic">Journey.</span></h1>
+                            <p class="text-emerald-800 text-sm md:text-lg mb-8 md:mb-10 max-w-lg font-light leading-relaxed">Experience the finest chauffeur services and curated luxury tours across Karnataka & Maharashtra.</p>
+                            <div class="flex flex-col sm:flex-row gap-4">
+                                <button onclick="router.navigate('rides')" class="bg-emerald-900 text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-gold-600 transition shadow-xl shadow-emerald-900/20 transform hover:-translate-y-1">
+                                    Book Chauffeur
+                                </button>
+                                <button onclick="router.navigate('tours')" class="bg-white text-emerald-900 border border-emerald-900/10 px-8 py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-emerald-50 transition">
+                                    View Itineraries
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exclusive Offers (New Feature) -->
+                <div class="container mx-auto px-6 py-12 md:py-20 -mt-10 md:-mt-20 relative z-10">
+                    <div class="flex justify-between items-end mb-6 md:mb-8">
+                        <div>
+                            <span class="text-gold-600 font-bold tracking-[0.2em] text-xs uppercase block mb-2">Limited Time</span>
+                            <h2 class="font-serif text-2xl md:text-3xl text-emerald-900">Exclusive Drop Offers</h2>
+                        </div>
+                        <div class="hidden md:flex gap-2">
+                            <button class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gold-500 hover:text-white transition"><i class="fa-solid fa-arrow-left"></i></button>
+                            <button class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gold-500 hover:text-white transition"><i class="fa-solid fa-arrow-right"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4 md:gap-6 overflow-x-auto pb-8 snap-x custom-scrollbar">
+                        ${RIDE_OFFERS.map(offer => `
+                            <div class="min-w-[280px] md:min-w-[350px] bg-white rounded-3xl shadow-xl shadow-gray-200/50 overflow-hidden snap-center group border border-gray-100 flex-shrink-0">
+                                <div class="h-40 md:h-48 overflow-hidden relative">
+                                    <img src="${offer.img}" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
+                                    <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-emerald-900 shadow-sm">
+                                        One Way Drop
+                                    </div>
+                                </div>
+                                <div class="p-5 md:p-6">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <div>
+                                            <div class="flex items-center gap-2 text-emerald-900 font-bold text-base md:text-lg mb-1">
+                                                <span>${offer.from.split(' ')[0]}</span>
+                                                <i class="fa-solid fa-arrow-right text-gold-500 text-sm"></i>
+                                                <span>${offer.to}</span>
+                                            </div>
+                                            <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">${offer.vehicle}</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-xl md:text-2xl font-serif text-gold-600 font-bold">₹${offer.price}</p>
+                                            <p class="text-[10px] text-gray-400 line-through">₹${offer.price + 500}</p>
+                                        </div>
+                                    </div>
+                                    <button onclick="bookOffer('${offer.id}')" class="w-full bg-emerald-50 text-emerald-900 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-emerald-900 hover:text-white transition-colors">
+                                        Book Now
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Features -->
+                <div class="bg-white py-12 md:py-20">
+                    <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12">
+                        <div class="text-center group">
+                            <div class="w-16 h-16 bg-cream rounded-2xl mx-auto flex items-center justify-center text-gold-500 text-2xl mb-6 group-hover:bg-gold-500 group-hover:text-white transition duration-300 shadow-lg shadow-gold-100">
+                                <i class="fa-solid fa-leaf"></i>
+                            </div>
+                            <h3 class="font-serif text-xl font-bold text-emerald-900 mb-3">Eco-Conscious</h3>
+                            <p class="text-gray-500 text-sm leading-relaxed">Sustainable tourism practices prioritizing the pristine nature of the Western Ghats.</p>
+                        </div>
+                        <div class="text-center group">
+                            <div class="w-16 h-16 bg-cream rounded-2xl mx-auto flex items-center justify-center text-gold-500 text-2xl mb-6 group-hover:bg-gold-500 group-hover:text-white transition duration-300 shadow-lg shadow-gold-100">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                            <h3 class="font-serif text-xl font-bold text-emerald-900 mb-3">Premium Safety</h3>
+                            <p class="text-gray-500 text-sm leading-relaxed">24/7 verified chauffeurs, live tracking, and secure digital payments.</p>
+                        </div>
+                        <div class="text-center group">
+                            <div class="w-16 h-16 bg-cream rounded-2xl mx-auto flex items-center justify-center text-gold-500 text-2xl mb-6 group-hover:bg-gold-500 group-hover:text-white transition duration-300 shadow-lg shadow-gold-100">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            </div>
+                            <h3 class="font-serif text-xl font-bold text-emerald-900 mb-3">AI Concierge</h3>
+                            <p class="text-gray-500 text-sm leading-relaxed">Personalized recommendations for food, culture, and packing via Yogi.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderRides(container) {
+            const { step, pickup, drop, distance, loading } = state.ride;
+
+            container.innerHTML = `
+                <div class="relative h-[calc(100vh-64px)] w-full animate-fade-in flex flex-col md:flex-row">
+                    <!-- Map Background -->
+                    <div id="map" class="absolute inset-0 z-0"></div>
+                    
+                    <!-- Booking Panel (Mobile Bottom Sheet / Desktop Sidebar) -->
+                    <div class="absolute bottom-0 left-0 w-full md:relative md:w-[480px] md:h-full bg-white z-10 rounded-t-3xl md:rounded-none shadow-[0_-5px_30px_rgba(0,0,0,0.1)] md:shadow-2xl flex flex-col transition-all duration-300 max-h-[85vh] md:max-h-full">
+                        
+                        <!-- Drag Handle for Mobile -->
+                        <div class="md:hidden w-full flex justify-center pt-3 pb-1">
+                            <div class="w-12 h-1.5 bg-gray-200 rounded-full"></div>
+                        </div>
+
+                        <div class="p-6 md:p-8 pb-4">
+                            <h2 class="font-serif text-2xl md:text-3xl text-emerald-900 mb-1">Book a Journey</h2>
+                            <p class="text-gray-400 text-xs md:text-sm">Luxury chauffeur services.</p>
+                        </div>
+
+                        <div class="flex-1 overflow-y-auto custom-scrollbar px-6 md:px-8 pb-20 md:pb-8">
+                            <!-- Offers Section -->
+                            <div class="mb-6 md:mb-8">
+                                <h3 class="text-[10px] md:text-xs font-bold text-gold-600 uppercase tracking-widest mb-3">Hot Deals</h3>
+                                <div class="flex gap-3 md:gap-4 overflow-x-auto pb-4 custom-scrollbar snap-x">
+                                    ${RIDE_OFFERS.map(o => `
+                                        <div onclick="bookOffer('${o.id}')" class="min-w-[180px] md:min-w-[200px] bg-cream rounded-xl border border-gray-100 p-3 cursor-pointer hover:border-gold-400 transition snap-center flex-shrink-0">
+                                            <div class="flex justify-between items-center mb-2">
+                                                <span class="text-xs font-bold text-emerald-900 truncate max-w-[80px]">${o.to}</span>
+                                                <span class="text-xs font-bold text-gold-600">₹${o.price}</span>
+                                            </div>
+                                            <div class="text-[10px] text-gray-400 truncate">From ${o.from}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <div class="${step === 'INPUT' ? 'block' : 'hidden'} space-y-4 md:space-y-6">
+                                <div class="space-y-3 md:space-y-4">
+                                    <div class="relative group">
+                                        <label class="text-[10px] uppercase tracking-widest text-emerald-900 font-bold mb-1 md:mb-2 block">Pickup Location</label>
+                                        <div class="relative">
+                                            <div class="absolute left-4 top-3.5 text-gold-500"><i class="fa-solid fa-location-dot"></i></div>
+                                            <input id="pickup-input" value="${pickup}" class="w-full bg-gray-50 border border-gray-200 text-emerald-900 pl-12 py-3 md:py-3.5 rounded-xl focus:border-gold-500 focus:bg-white outline-none transition-all placeholder:text-gray-400 shadow-sm text-sm" placeholder="e.g. Mumbai Airport">
+                                        </div>
+                                    </div>
+                                    <div class="relative group">
+                                        <label class="text-[10px] uppercase tracking-widest text-emerald-900 font-bold mb-1 md:mb-2 block">Destination</label>
+                                        <div class="relative">
+                                            <div class="absolute left-4 top-3.5 text-emerald-400"><i class="fa-solid fa-map-pin"></i></div>
+                                            <input id="drop-input" value="${drop}" class="w-full bg-gray-50 border border-gray-200 text-emerald-900 pl-12 py-3 md:py-3.5 rounded-xl focus:border-gold-500 focus:bg-white outline-none transition-all placeholder:text-gray-400 shadow-sm text-sm" placeholder="e.g. Taj Mahal Palace">
+                                        </div>
+                                    </div>
+                                </div>
+                                <button onclick="estimateRide()" class="w-full bg-emerald-900 text-white font-bold py-3.5 md:py-4 rounded-xl hover:bg-gold-600 transition-all flex items-center justify-center gap-2 mt-2 shadow-lg shadow-emerald-900/20 uppercase text-[10px] md:text-xs tracking-widest">
+                                    ${loading ? `<div class="loader w-4 h-4 border-white/20 border-t-white"></div>` : `Calculate Fare <i class="fa-solid fa-arrow-right"></i>`}
+                                </button>
+                            </div>
+
+                            <div class="${step === 'LIST' ? 'block' : 'hidden'} animate-slide-up">
+                                <div class="flex justify-between items-end border-b border-gray-100 pb-3 mb-4">
+                                    <div>
+                                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Total Distance</span>
+                                        <div class="text-2xl md:text-3xl font-serif text-emerald-900 mt-1">${distance} <span class="text-sm font-sans text-gold-500">km</span></div>
+                                    </div>
+                                    <button onclick="state.ride.step='INPUT'; renderRides(document.getElementById('app-root'))" class="text-xs text-gold-600 hover:text-emerald-900 font-bold">Change Route</button>
+                                </div>
+                                
+                                <div class="space-y-3">
+                                    ${VEHICLES.map(v => `
+                                        <div onclick="openBookingModal('${v.id}')" class="group relative bg-white border border-gray-100 rounded-xl p-3 md:p-4 hover:border-gold-500 hover:shadow-lg transition-all cursor-pointer flex items-center gap-4">
+                                            <div class="w-16 md:w-20 h-12 md:h-14 rounded-lg bg-gray-100 overflow-hidden shrink-0">
+                                                <img src="${v.img}" class="w-full h-full object-cover mix-blend-multiply">
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <h4 class="text-emerald-900 font-bold tracking-wide truncate text-sm md:text-base">${v.name}</h4>
+                                                <div class="flex items-center gap-2 mt-1">
+                                                    <span class="text-[9px] uppercase font-bold bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">${v.type}</span>
+                                                    <span class="text-[10px] text-gray-400">${v.seats} Seats</span>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                <div class="text-gold-600 font-bold text-base md:text-lg">₹${Math.round(distance * v.rate).toLocaleString()}</div>
+                                                <div class="text-[10px] text-gray-400">₹${v.rate}/km</div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            setTimeout(() => {
+                if (!state.map && document.getElementById('map')) {
+                    state.map = L.map('map', { zoomControl: false }).setView([19.0760, 72.8777], 13);
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(state.map);
+                }
+            }, 100);
+        }
+
+        function renderBookingModal() {
+            const v = state.ride.selectedVehicle;
+            const isFixed = !!state.ride.fixedPrice;
+            const fare = state.ride.fixedPrice || Math.round(state.ride.distance * v.rate);
+            
+            const modalHTML = `
+            <div class="fixed inset-0 z-[80] flex items-end md:items-center justify-center sm:p-4 animate-fade-in">
+                <div class="absolute inset-0 bg-emerald-900/60 backdrop-blur-sm" onclick="closeBookingModal()"></div>
+                <div class="relative w-full md:max-w-md bg-white rounded-t-3xl md:rounded-2xl shadow-2xl p-6 md:p-8 animate-slide-up max-h-[90vh] overflow-y-auto">
+                    <button onclick="closeBookingModal()" class="absolute right-4 top-4 text-gray-400 hover:text-emerald-900 bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-xmark text-lg"></i></button>
+                    
+                    <h2 class="text-xl md:text-2xl font-serif text-emerald-900 mb-6 mt-2">Confirm Request</h2>
+                    
+                    <div class="flex items-center gap-4 bg-cream p-4 rounded-xl mb-6 border border-gray-100">
+                        <img src="${v.img}" class="w-16 h-12 object-cover rounded mix-blend-multiply">
+                        <div>
+                            <h3 class="text-emerald-900 font-bold text-sm">${v.name}</h3>
+                            <p class="text-gold-600 font-bold text-sm">₹${fare.toLocaleString()}${isFixed ? ' (Fixed Offer)' : ''}</p>
+                        </div>
+                    </div>
+
+                    <form onsubmit="submitRideBooking(event)" class="space-y-4">
+                        <div class="space-y-2">
+                            <label class="text-xs text-gray-500 uppercase font-bold tracking-wider">Full Name</label>
+                            <input name="customerName" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-emerald-900 outline-none focus:border-gold-500 text-sm" placeholder="e.g. Rahul Sharma">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label class="text-xs text-gray-500 uppercase font-bold tracking-wider">Phone</label>
+                                <input name="customerPhone" type="tel" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-emerald-900 outline-none focus:border-gold-500 text-sm" placeholder="+91">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-xs text-gray-500 uppercase font-bold tracking-wider">Passengers</label>
+                                <input name="passengers" type="number" min="1" max="${v.seats || 6}" value="1" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-emerald-900 outline-none focus:border-gold-500 text-sm">
+                            </div>
+                        </div>
+                        
+                        <div class="bg-blue-50 text-blue-800 p-3 rounded text-[10px] flex gap-2 items-start">
+                            <i class="fa-brands fa-whatsapp mt-0.5"></i> 
+                            <span>This will open WhatsApp to confirm details with our dispatcher.</span>
+                        </div>
+
+                        <button type="submit" class="w-full bg-emerald-900 text-white font-bold py-4 rounded-xl hover:bg-gold-600 transition-colors uppercase text-xs tracking-widest shadow-lg">
+                            Confirm Booking
+                        </button>
+                    </form>
+                </div>
+            </div>`;
+            document.getElementById('modal-container').innerHTML = modalHTML;
+        }
+
+        function renderTours(container) {
+            container.innerHTML = `
+                <div class="container mx-auto px-6 py-12 animate-fade-in">
+                    <div class="mb-12 text-center">
+                        <span class="text-gold-600 font-bold tracking-[0.3em] text-xs uppercase mb-3 block">Bespoke Itineraries</span>
+                        <h2 class="font-serif text-3xl md:text-4xl text-emerald-900">Curated Escapes</h2>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-20">
+                        ${TOURS.map(t => `
+                            <div class="group bg-white rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer border border-gray-100" onclick="router.navigate('tour-detail', '${t.id}')">
+                                <div class="h-64 overflow-hidden relative">
+                                    <img src="${t.image}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                                    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-emerald-900 shadow-sm">
+                                        <i class="fa-solid fa-star text-gold-500 mr-1"></i> ${t.rating}
+                                    </div>
+                                    <div class="absolute bottom-4 left-4 bg-emerald-900 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                                        ${t.duration}
+                                    </div>
+                                </div>
+                                <div class="p-8">
+                                    <h3 class="font-serif text-2xl text-emerald-900 mb-2 group-hover:text-gold-600 transition-colors">${t.title}</h3>
+                                    <p class="text-gray-500 text-sm mb-6 line-clamp-2">${t.desc}</p>
+                                    <div class="flex justify-between items-center border-t border-gray-100 pt-4">
+                                        <div class="text-gold-600 font-bold text-xl">₹${t.price.toLocaleString()}</div>
+                                        <div class="text-xs text-gray-400 font-bold uppercase tracking-wider group-hover:text-emerald-900 transition-colors">View Details <i class="fa-solid fa-arrow-right ml-1"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>`;
+        }
+
+        function renderTourDetail(container, tourId) {
+            const tour = TOURS.find(t => t.id === tourId);
+            if (!tour) return router.navigate('tours');
+            state.currentTour = tour;
+
+            container.innerHTML = `
+                <div class="container mx-auto px-6 py-8 animate-fade-in pb-24">
+                    <button onclick="router.navigate('tours')" class="text-gray-400 hover:text-emerald-900 mb-6 flex items-center text-xs uppercase tracking-widest transition"><i class="fa-solid fa-arrow-left mr-2"></i> Back to Escapes</button>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                        <div class="lg:col-span-2 space-y-8">
+                            <div class="rounded-3xl overflow-hidden shadow-2xl h-[300px] md:h-[450px] relative group">
+                                <img src="${tour.image}" class="w-full h-full object-cover transition duration-700 group-hover:scale-105">
+                                <div class="absolute inset-0 bg-gradient-to-t from-emerald-900/80 to-transparent"></div>
+                                <div class="absolute bottom-8 left-8">
+                                    <h1 class="font-serif text-3xl md:text-5xl text-white mb-2">${tour.title}</h1>
+                                    <div class="flex gap-4 text-sm text-gray-200 font-bold">
+                                        <span><i class="fa-solid fa-map-pin mr-2 text-gold-500"></i>${tour.region}</span>
+                                        <span><i class="fa-regular fa-clock mr-2 text-gold-500"></i>${tour.duration}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100">
+                                <h3 class="font-serif text-2xl text-emerald-900 mb-4">Experience</h3>
+                                <p class="text-gray-600 leading-relaxed mb-8 text-sm md:text-base">${tour.desc}</p>
+                                
+                                <h3 class="font-serif text-xl text-emerald-900 mb-4">Highlights</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    ${tour.highlights.map(h => `<div class="flex items-center bg-cream p-4 rounded-xl border border-gray-100 text-emerald-800 text-sm font-semibold"><i class="fa-solid fa-star text-gold-500 mr-3"></i>${h}</div>`).join('')}
+                                </div>
+                            </div>
+
+                            <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 mt-8">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="font-serif text-xl text-emerald-900">Yogi AI Insights</h3>
+                                    <button onclick="getTourInsights('${tour.title}')" class="text-xs bg-gold-50 text-gold-600 border border-gold-200 px-4 py-2 rounded-full hover:bg-gold-500 hover:text-white transition uppercase font-bold tracking-wider">Ask Yogi</button>
+                                </div>
+                                <div id="tour-ai-content" class="text-gray-500 text-sm italic border-l-4 border-gold-400 pl-4 py-2 bg-cream rounded-r-lg">
+                                    Click the button to get personalized packing tips & cultural insights for this trip.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-1">
+                            <div class="bg-white p-8 rounded-3xl sticky top-24 border border-gray-100 shadow-xl shadow-gray-200/50">
+                                <div class="text-center mb-8 border-b border-gray-100 pb-8">
+                                    <p class="text-gray-400 text-xs uppercase tracking-widest font-bold">Total Package Price</p>
+                                    <p class="text-4xl font-serif text-emerald-900 mt-2 font-bold">₹${(tour.price * 1.05).toLocaleString()}</p>
+                                    <p class="text-xs text-gray-500 mt-1">Inclusive of all taxes</p>
+                                </div>
+                                
+                                <button onclick="router.navigate('booking', '${tour.id}')" class="w-full bg-emerald-900 text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-gold-600 transition shadow-lg shadow-emerald-900/20 mb-4 transform hover:-translate-y-1">
+                                    Book Now
+                                </button>
+                                
+                                <div class="text-center text-xs text-gray-400 space-y-3 font-semibold">
+                                    <p><i class="fa-solid fa-check text-green-500 mr-2"></i>Instant Confirmation</p>
+                                    <p><i class="fa-solid fa-shield-halved text-green-500 mr-2"></i>Secure Payment</p>
+                                    <p><i class="fa-solid fa-user-tie text-green-500 mr-2"></i>Expert Guide</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        function renderBooking(container, tourId) {
+            const tour = TOURS.find(t => t.id === tourId);
+            const total = Math.round(tour.price * 1.05);
+
+            container.innerHTML = `
+                <div class="max-w-2xl mx-auto py-12 px-6 animate-slide-up">
+                    <div class="bg-white p-10 rounded-3xl border border-gray-100 shadow-xl">
+                        <h2 class="font-serif text-3xl text-emerald-900 mb-2">Secure Booking</h2>
+                        <p class="text-gray-500 text-sm mb-8">Complete your reservation for ${tour.title}</p>
+                        
+                        <form onsubmit="handleBookingSubmit(event, '${tour.id}', ${total})" class="space-y-6">
+                            <div class="grid grid-cols-2 gap-6">
+                                <div>
+                                    <label class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-2 block">Name</label>
+                                    <input name="name" required class="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-emerald-900 outline-none focus:border-gold-500 transition">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-2 block">Phone</label>
+                                    <input name="phone" required class="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-emerald-900 outline-none focus:border-gold-500 transition">
+                                </div>
+                            </div>
+                            
+                            <div class="bg-cream p-6 rounded-xl border border-dashed border-gold-300 text-center">
+                                <p class="text-emerald-900 font-bold mb-4">Scan to Pay ₹${total.toLocaleString()}</p>
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=7743805933&pn=Gaanyogi&am=${total}&cu=INR" class="w-40 h-40 mx-auto rounded-lg mb-2 shadow-sm">
+                                <p class="text-xs text-gray-500">UPI: 7743805933@upi</p>
+                            </div>
+
+                            <button type="submit" class="w-full bg-green-600 text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-green-700 transition shadow-lg shadow-green-600/20">
+                                I Have Paid
+                            </button>
+                        </form>
+                    </div>
+                </div>`;
+        }
+
+        function renderAdmin(container) {
+            if (!state.isAdminVerified) {
+                container.innerHTML = `
+                    <div class="flex items-center justify-center h-[70vh] animate-fade-in">
+                        <div class="bg-white p-10 rounded-3xl border border-gray-100 w-full max-w-sm text-center shadow-xl">
+                            <div class="w-16 h-16 bg-cream rounded-full flex items-center justify-center mx-auto mb-6 text-emerald-900 text-2xl">
+                                <i class="fa-solid fa-lock"></i>
+                            </div>
+                            <h2 class="font-serif text-2xl text-emerald-900 mb-6">Admin Access</h2>
+                            <form onsubmit="handleAdminLogin(event)">
+                                <input type="password" id="admin-password-input" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-emerald-900 text-center mb-4 focus:border-gold-500 outline-none" placeholder="Enter Passkey" required>
+                                <button type="submit" class="w-full bg-emerald-900 text-white py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-gold-600 transition">Unlock</button>
+                            </form>
+                        </div>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="container mx-auto px-6 py-10 animate-fade-in">
+                    <h2 class="font-serif text-3xl text-emerald-900 mb-8">Dashboard</h2>
+                    <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-lg overflow-x-auto">
+                        <table class="w-full text-sm text-left text-gray-500 min-w-[600px]">
+                            <thead class="text-xs text-emerald-900 uppercase bg-cream border-b border-gray-100">
+                                <tr>
+                                    <th class="px-6 py-4">ID</th>
+                                    <th class="px-6 py-4">Customer</th>
+                                    <th class="px-6 py-4">Service</th>
+                                    <th class="px-6 py-4">Amount</th>
+                                    <th class="px-6 py-4">Status</th>
+                                    <th class="px-6 py-4">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-table-body"><tr><td colspan="6" class="p-6 text-center">Loading...</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>`;
+            
+            const q = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tourBookings').orderBy('createdAt', 'desc').limit(10);
+            q.onSnapshot(snapshot => {
+                const tbody = document.getElementById('admin-table-body');
+                if(!tbody) return;
+                tbody.innerHTML = snapshot.docs.map(doc => {
+                    const d = doc.data();
+                    return `<tr class="border-b border-gray-50 hover:bg-gray-50">
+                        <td class="px-6 py-4 font-mono text-xs text-gray-400">${doc.id.slice(0,6)}</td>
+                        <td class="px-6 py-4 text-emerald-900 font-bold">${d.customerName}</td>
+                        <td class="px-6 py-4">${d.tourName}</td>
+                        <td class="px-6 py-4 text-gold-600 font-bold">₹${d.amount}</td>
+                        <td class="px-6 py-4"><span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider">${d.status}</span></td>
+                        <td class="px-6 py-4"><button onclick="verifyPayment('${doc.id}', '${d.customerName}', ${d.amount})" class="text-green-600 hover:text-green-800 text-xs uppercase font-bold bg-green-50 px-3 py-1 rounded-full">Verify</button></td>
+                    </tr>`;
+                }).join('');
+            });
+        }
+
+        // --- SHARED UTILS ---
+        window.handleChatSend = async () => {
+            const input = document.getElementById('chat-input');
+            const msgs = document.getElementById('chat-messages');
+            const text = input.value.trim();
+            if(!text) return;
+            msgs.innerHTML += `<div class="flex justify-end animate-slide-up"><div class="bg-gold-500 text-white p-3 rounded-2xl rounded-tr-none shadow-sm max-w-[85%] font-medium">${text}</div></div>`;
+            input.value = '';
+            const reply = await callGemini(text, "You are Yogi.");
+            msgs.innerHTML += `<div class="flex justify-start animate-slide-up"><div class="bg-white p-3 rounded-2xl rounded-tl-none border border-gray-200 shadow-sm max-w-[85%] text-emerald-900">${reply || "Connecting..."}</div></div>`;
+            msgs.scrollTop = msgs.scrollHeight;
+        };
+
+        window.showToast = (msg, type) => {
+            const t = document.getElementById('toast-container');
+            const el = document.createElement('div');
+            el.className = `bg-white border-l-4 ${type === 'success' ? 'border-green-500' : 'border-red-500'} p-4 rounded shadow-2xl text-emerald-900 text-sm animate-slide-up flex items-center gap-3 font-bold`;
+            el.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-check' : 'fa-info-circle'}"></i> ${msg}`;
+            t.appendChild(el);
+            setTimeout(() => el.remove(), 3000);
+        };
+
+        window.toggleChat = () => document.getElementById('chat-window').classList.toggle('hidden');
+        window.toggleMobileMenu = () => document.getElementById('mobile-menu').classList.toggle('hidden');
+        window.handleAdminLogin = (e) => {
+            e.preventDefault();
+            if(document.getElementById('admin-password-input').value === 'Aakash@gaanyogi') {
+                state.isAdminVerified = true;
+                router.navigate('admin');
+            } else showToast("Invalid Key", "error");
+        };
+        window.verifyPayment = async (id, name, amt) => {
+            if(!confirm(`Verify payment for ${name}?`)) return;
+            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tourBookings').doc(id).update({ status: 'PAID' });
+            showToast("Payment Verified", "success");
+        };
+        window.handleBookingSubmit = async (e, id, amt) => {
+            e.preventDefault();
+            const f = e.target;
+            const tourTitle = TOURS.find(t=>t.id===id).title;
+            const booking = {
+                tourId: id, tourName: tourTitle, customerName: f.name.value, phone: f.phone.value, amount: amt, status: 'PENDING', createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tourBookings').add(booking);
+            
+            // Send summary to WhatsApp (Updated Number)
+            const msg = `*Tour Booking Request*\nTour: ${tourTitle}\nCustomer: ${booking.customerName}\nPhone: ${booking.phone}\nAmount: ₹${amt}`;
+            window.open(`https://wa.me/918080062440?text=${encodeURIComponent(msg)}`, '_blank');
+
+            showToast("Booking Received", "success");
+            router.navigate('home');
+        };
+
+        // EXPORTS
+        window.estimateRide = estimateRide;
+        window.openBookingModal = openBookingModal;
+        window.closeBookingModal = closeBookingModal;
+        window.submitRideBooking = submitRideBooking;
+        window.getTourInsights = async (title) => {
+            const el = document.getElementById('tour-ai-content');
+            el.innerHTML = "Thinking...";
+            el.innerHTML = await callGemini(`Tips for ${title}`, "Travel Expert") || "Error";
+        };
+        window.bookOffer = bookOffer;
+        window.router = router;
+
+        window.addEventListener('load', async () => {
+            initAuth();
+            router.navigate('home');
+        });
+    </script>
+</body>
+</html>
