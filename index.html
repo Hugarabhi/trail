@@ -14,10 +14,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <!-- Firebase SDK with compatibility mode -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <style>
         :root {
             --primary-dark: #17252A;
@@ -80,30 +80,12 @@
             50% { box-shadow: 0 0 30px rgba(58, 175, 169, 0.8); }
         }
         
-        @keyframes slideInRight {
-            from { transform: translateX(100px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        @keyframes slideInLeft {
-            from { transform: translateX(-100px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
         .animate-float {
             animation: float 6s ease-in-out infinite;
         }
         
         .animate-pulse-glow {
             animation: pulse-glow 3s ease-in-out infinite;
-        }
-        
-        .animate-slide-right {
-            animation: slideInRight 0.8s ease-out forwards;
-        }
-        
-        .animate-slide-left {
-            animation: slideInLeft 0.8s ease-out forwards;
         }
         
         /* Custom Scrollbar */
@@ -176,32 +158,32 @@
             background: linear-gradient(90deg, rgba(58, 175, 169, 0.3), rgba(222, 242, 241, 0.2));
         }
         
-        /* Strike Meter */
-        .strike-meter {
-            width: 100%;
-            height: 8px;
-            border-radius: 4px;
-            background: rgba(43, 122, 120, 0.3);
-            overflow: hidden;
-            margin-top: 8px;
+        /* Utility Classes */
+        .page {
+            display: none;
         }
         
-        .strike-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.5s ease, background-color 0.5s ease;
+        .page.active {
+            display: block;
         }
         
-        .strike-safe {
-            background: linear-gradient(90deg, #3AAFA9, #2B7A78);
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
         }
         
-        .strike-warning {
-            background: linear-gradient(90deg, #FFC107, #FF9800);
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
-        .strike-danger {
-            background: linear-gradient(90deg, #F44336, #D32F2F);
+        .skill-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(58, 175, 169, 0.2);
+            color: var(--accent-teal);
+            border-radius: 15px;
+            font-size: 12px;
+            margin: 2px;
         }
     </style>
 </head>
@@ -210,72 +192,30 @@
     <nav class="glass-dark fixed top-0 left-0 right-0 z-50 py-4 px-6 md:px-12">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-2">
-                <div class="w-10 h-10 rounded-full gradient-accent flex items-center justify-center">
+                <div class="w-10 h-10 rounded-full gradient-accent flex items-center justify-center cursor-pointer" onclick="showPage('landing')">
                     <span class="font-orbitron font-bold text-primary-dark text-lg">C</span>
                 </div>
-                <a href="#home" class="font-orbitron text-2xl font-bold text-accent-teal tracking-wider">CODENPROFIT</a>
+                <span class="font-orbitron text-2xl font-bold text-accent-teal tracking-wider cursor-pointer" onclick="showPage('landing')">CODENPROFIT</span>
             </div>
             
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="#home" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Home</a>
-                <a href="#difference" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">The Difference</a>
-                <a href="#services" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Services</a>
-                <a href="#showcase" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Showcase</a>
-                <a href="#goal" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Our Goal</a>
-                <a href="#testimonials" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Testimonials</a>
+            <div class="hidden md:flex items-center space-x-8" id="nav-links">
+                <!-- Navigation links will be updated based on page -->
             </div>
             
-            <div class="flex items-center space-x-4">
-                <div id="user-info" class="hidden items-center space-x-3">
-                    <div class="flex items-center space-x-2">
-                        <div id="user-avatar" class="w-8 h-8 rounded-full gradient-accent flex items-center justify-center text-primary-dark font-semibold"></div>
-                        <span id="user-name" class="text-sm text-soft-ice"></span>
-                    </div>
-                    <button onclick="logout()" class="px-4 py-1 rounded-lg border border-accent-teal text-accent-teal text-sm hover:bg-accent-teal/10 transition-all duration-300">Logout</button>
-                </div>
-                <button onclick="showAuthModal('login')" id="login-btn" class="px-5 py-2 rounded-lg border border-accent-teal text-accent-teal hover:bg-accent-teal/10 transition-all duration-300">Login</button>
-                <button onclick="showAuthModal('signup')" id="signup-btn" class="px-5 py-2 rounded-lg bg-accent-teal text-primary-dark font-medium hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300 transform hover:scale-[1.03]">Join Movement</button>
-                <button id="mobile-menu-btn" class="md:hidden text-soft-ice">
-                    <i class="fas fa-bars text-xl"></i>
-                </button>
-            </div>
-        </div>
-        
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="md:hidden glass-effect mt-4 p-6 rounded-lg hidden">
-            <div class="flex flex-col space-y-4">
-                <a href="#home" class="text-soft-ice hover:text-accent-teal transition-colors duration-300 py-2">Home</a>
-                <a href="#difference" class="text-soft-ice hover:text-accent-teal transition-colors duration-300 py-2">The Difference</a>
-                <a href="#services" class="text-soft-ice hover:text-accent-teal transition-colors duration-300 py-2">Services</a>
-                <a href="#showcase" class="text-soft-ice hover:text-accent-teal transition-colors duration-300 py-2">Showcase</a>
-                <a href="#goal" class="text-soft-ice hover:text-accent-teal transition-colors duration-300 py-2">Our Goal</a>
-                <a href="#testimonials" class="text-soft-ice hover:text-accent-teal transition-colors duration-300 py-2">Testimonials</a>
-                <div id="mobile-user-info" class="pt-4 border-t border-soft-ice/20 hidden">
-                    <div class="flex items-center space-x-3 mb-4">
-                        <div id="mobile-user-avatar" class="w-10 h-10 rounded-full gradient-accent flex items-center justify-center text-primary-dark font-semibold"></div>
-                        <div>
-                            <div id="mobile-user-name" class="font-medium"></div>
-                            <div id="mobile-user-type" class="text-xs text-soft-ice"></div>
-                        </div>
-                    </div>
-                    <button onclick="logout()" class="w-full px-5 py-2 rounded-lg border border-accent-teal text-accent-teal hover:bg-accent-teal/10 transition-all duration-300">Logout</button>
-                </div>
-                <div class="pt-4 border-t border-soft-ice/20">
-                    <button onclick="showAuthModal('login')" id="mobile-login-btn" class="w-full px-5 py-2 rounded-lg border border-accent-teal text-accent-teal hover:bg-accent-teal/10 transition-all duration-300 mb-3">Login</button>
-                    <button onclick="showAuthModal('signup')" id="mobile-signup-btn" class="w-full px-5 py-2 rounded-lg bg-accent-teal text-primary-dark font-medium hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300">Join Movement</button>
-                </div>
+            <div class="flex items-center space-x-4" id="nav-buttons">
+                <!-- Navigation buttons will be updated based on auth state -->
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main>
-        <!-- Landing Page -->
-        <section id="home" class="min-h-screen pt-24 px-6 md:px-12">
+    <!-- Main Content Container -->
+    <main class="pt-24">
+        <!-- LANDING PAGE -->
+        <section id="landing-page" class="page active min-h-screen px-6 md:px-12 fade-in">
             <div class="container mx-auto">
                 <!-- Hero Section -->
                 <div class="flex flex-col lg:flex-row items-center justify-between mb-20">
-                    <div class="lg:w-1/2 mb-12 lg:mb-0 animate-slide-left">
+                    <div class="lg:w-1/2 mb-12 lg:mb-0">
                         <div class="mb-6">
                             <span class="inline-block px-4 py-1 rounded-full bg-surface-teal/30 text-accent-teal text-sm font-medium mb-4">ELITE TALENT NETWORK</span>
                             <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
@@ -298,7 +238,7 @@
                         </div>
                     </div>
                     
-                    <div class="lg:w-1/2 flex justify-center animate-slide-right">
+                    <div class="lg:w-1/2 flex justify-center">
                         <div class="relative">
                             <div class="w-80 h-80 md:w-96 md:h-96 rounded-full gradient-accent animate-float flex items-center justify-center">
                                 <div class="w-64 h-64 md:w-80 md:h-80 rounded-full glass-effect flex flex-col items-center justify-center p-8">
@@ -321,7 +261,7 @@
                             <div class="mb-4">
                                 <canvas id="devChart" height="120"></canvas>
                             </div>
-                            <h3 class="text-4xl font-bold text-accent-teal mb-2" id="devCount">150+</h3>
+                            <h3 class="text-4xl font-bold text-accent-teal mb-2">150+</h3>
                             <p class="text-soft-ice text-lg">Verified Developers</p>
                             <p class="text-soft-ice mt-2">Elite student talent from top 5% of applicants</p>
                         </div>
@@ -330,7 +270,7 @@
                             <div class="mb-4">
                                 <canvas id="projectChart" height="120"></canvas>
                             </div>
-                            <h3 class="text-4xl font-bold text-accent-teal mb-2" id="projectCount">50+</h3>
+                            <h3 class="text-4xl font-bold text-accent-teal mb-2">50+</h3>
                             <p class="text-soft-ice text-lg">Active Projects</p>
                             <p class="text-soft-ice mt-2">Real-world business solutions in development</p>
                         </div>
@@ -549,7 +489,7 @@
                     </div>
                 </div>
                 
-                <!-- Testimonials & Social Proof -->
+                <!-- Testimonials -->
                 <div id="testimonials" class="mb-20">
                     <h2 class="text-3xl font-bold mb-12 text-center">SOCIAL PROOF & FEEDBACK</h2>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -570,46 +510,6 @@
                                     </div>
                                     <p class="text-lg italic text-soft-ice">"Codenprofit delivered a complete e-commerce solution in 6 weeks that our previous agency estimated at 5 months. By bypassing agencies, we saved 60% on costs while getting premium results."</p>
                                 </div>
-                                
-                                <div class="testimonial hidden">
-                                    <div class="flex items-center mb-6">
-                                        <div class="w-16 h-16 rounded-full gradient-accent flex items-center justify-center mr-4">
-                                            <span class="font-bold text-primary-dark text-xl">SP</span>
-                                        </div>
-                                        <div>
-                                            <h4 class="text-xl font-bold">Sophia Patel</h4>
-                                            <p class="text-soft-ice">Product Lead, FinEdge Capital</p>
-                                        </div>
-                                    </div>
-                                    <p class="text-lg italic text-soft-ice">"The elite vetting system is real. Our Codenprofit developer had better React optimization skills than our senior in-house engineers. This platform is disrupting the traditional agency model."</p>
-                                </div>
-                                
-                                <div class="testimonial hidden">
-                                    <div class="flex items-center mb-6">
-                                        <div class="w-16 h-16 rounded-full gradient-accent flex items-center justify-center mr-4">
-                                            <span class="font-bold text-primary-dark text-xl">AM</span>
-                                        </div>
-                                        <div>
-                                            <h4 class="text-xl font-bold">Alex Morgan</h4>
-                                            <p class="text-soft-ice">CTO, HealthTrack Analytics</p>
-                                        </div>
-                                    </div>
-                                    <p class="text-lg italic text-soft-ice">"Zero agency cut means we get 100% of the talent's attention. The badge & strike system ensures accountability we've never seen with freelancers before. Truly premium quality."</p>
-                                </div>
-                            </div>
-                            
-                            <div class="flex justify-center mt-8">
-                                <button class="testimonial-prev p-3 rounded-full bg-surface-teal/30 text-accent-teal hover:bg-accent-teal/20 transition-colors mr-4">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <div class="flex space-x-2">
-                                    <button class="testimonial-dot w-3 h-3 rounded-full bg-accent-teal"></button>
-                                    <button class="testimonial-dot w-3 h-3 rounded-full bg-surface-teal/50"></button>
-                                    <button class="testimonial-dot w-3 h-3 rounded-full bg-surface-teal/50"></button>
-                                </div>
-                                <button class="testimonial-next p-3 rounded-full bg-surface-teal/30 text-accent-teal hover:bg-accent-teal/20 transition-colors ml-4">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
                             </div>
                         </div>
                         
@@ -643,54 +543,15 @@
                                         <span class="badge badge-premium">E-commerce Expert</span>
                                     </div>
                                 </div>
-                                
-                                <div class="developer-testimonial hidden">
-                                    <div class="flex items-center mb-6">
-                                        <div class="w-16 h-16 rounded-full gradient-accent flex items-center justify-center mr-4">
-                                            <span class="font-bold text-primary-dark text-xl">PK</span>
-                                        </div>
-                                        <div>
-                                            <h4 class="text-xl font-bold">Priya Kumar</h4>
-                                            <p class="text-soft-ice">AI/ML Specialist</p>
-                                            <div class="flex items-center mt-1">
-                                                <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
-                                                <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
-                                                <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
-                                                <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
-                                                <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
-                                                <span class="text-sm text-soft-ice ml-2">5.0 Rating</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <p class="text-lg italic text-soft-ice">"Went from academic projects to building BullNexAI - a stock prediction tool now used by a hedge fund. Earned $8,500 in my first project alone. The badge system helped me showcase my skills to premium clients."</p>
-                                    <div class="mt-4 flex flex-wrap gap-2">
-                                        <span class="badge badge-premium">AI/ML Expert</span>
-                                        <span class="badge badge-premium">Data Scientist</span>
-                                        <span class="badge badge-premium">Python Pro</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="flex justify-center mt-8">
-                                <button class="developer-testimonial-prev p-3 rounded-full bg-surface-teal/30 text-accent-teal hover:bg-accent-teal/20 transition-colors mr-4">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <div class="flex space-x-2">
-                                    <button class="developer-testimonial-dot w-3 h-3 rounded-full bg-accent-teal"></button>
-                                    <button class="developer-testimonial-dot w-3 h-3 rounded-full bg-surface-teal/50"></button>
-                                </div>
-                                <button class="developer-testimonial-next p-3 rounded-full bg-surface-teal/30 text-accent-teal hover:bg-accent-teal/20 transition-colors ml-4">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-        
-        <!-- Host Dashboard -->
-        <section id="host-dashboard" class="min-h-screen pt-24 px-6 md:px-12 bg-gradient-to-b from-primary-dark to-surface-teal/20 hidden">
+
+        <!-- HOST DASHBOARD -->
+        <section id="host-dashboard" class="page min-h-screen px-6 md:px-12">
             <div class="container mx-auto">
                 <div class="flex justify-between items-center mb-10">
                     <div>
@@ -698,7 +559,7 @@
                         <p class="text-soft-ice">Manage your business profile, projects, and elite developer network</p>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <button onclick="switchToLanding()" class="px-5 py-2 rounded-lg border border-accent-teal text-accent-teal hover:bg-accent-teal/10 transition-all duration-300">
+                        <button onclick="showPage('landing')" class="px-5 py-2 rounded-lg border border-accent-teal text-accent-teal hover:bg-accent-teal/10 transition-all duration-300">
                             <i class="fas fa-arrow-left mr-2"></i> Back to Home
                         </button>
                         <button onclick="showProjectSubmissionForm()" class="px-5 py-2 rounded-lg bg-accent-teal text-primary-dark font-medium hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300">
@@ -716,15 +577,15 @@
                         <div class="space-y-4" id="host-profile-info">
                             <div>
                                 <p class="text-soft-ice text-sm">Company Name</p>
-                                <p class="font-medium" id="host-company-name">Loading...</p>
+                                <p class="font-medium" id="host-company-name">TechNova Solutions</p>
                             </div>
                             <div>
                                 <p class="text-soft-ice text-sm">Industry</p>
-                                <p class="font-medium" id="host-industry">Loading...</p>
+                                <p class="font-medium" id="host-industry">Technology</p>
                             </div>
                             <div>
                                 <p class="text-soft-ice text-sm">Subscription Plan</p>
-                                <p class="font-medium text-accent-teal" id="host-subscription">Loading...</p>
+                                <p class="font-medium text-accent-teal" id="host-subscription">Pro ($299/month)</p>
                             </div>
                             <div class="pt-4">
                                 <button onclick="editHostProfile()" class="w-full px-4 py-2 rounded-lg border border-accent-teal text-accent-teal hover:bg-accent-teal/10 transition-all duration-300">
@@ -777,14 +638,14 @@
                     </div>
                 </div>
                 
-                <!-- Project Submission Form (Initially Hidden) -->
-                <div id="project-submission-form" class="glass-effect rounded-xl p-6 mb-10 hidden">
+                <!-- Project Submission Form -->
+                <div id="project-submission-form" class="glass-effect rounded-xl p-6 mb-10">
                     <h3 class="text-2xl font-bold mb-6">New Project Submission</h3>
                     <form id="projectForm" class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-soft-ice mb-2">Project Name *</label>
-                                <input type="text" id="projectName" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal">
+                                <input type="text" id="projectName" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal" placeholder="E-commerce Dashboard Redesign">
                             </div>
                             <div>
                                 <label class="block text-soft-ice mb-2">Industry *</label>
@@ -804,14 +665,14 @@
                             <label class="block text-soft-ice mb-2">Project Budget *</label>
                             <div class="relative">
                                 <span class="absolute left-4 top-3 text-soft-ice">$</span>
-                                <input type="number" id="projectBudget" required min="500" step="100" class="w-full pl-10 pr-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal">
+                                <input type="number" id="projectBudget" required min="500" step="100" class="w-full pl-10 pr-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal" placeholder="3500">
                             </div>
                             <p class="text-sm text-soft-ice mt-2">Minimum project budget: $500</p>
                         </div>
                         
                         <div>
                             <label class="block text-soft-ice mb-2">Project Vision & Requirements *</label>
-                            <textarea id="projectVision" rows="5" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal"></textarea>
+                            <textarea id="projectVision" rows="5" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal" placeholder="Describe your project vision, goals, and specific requirements..."></textarea>
                             <p class="text-sm text-soft-ice mt-2">Describe your project in detail. The more specific, the better the match with our elite developers.</p>
                         </div>
                         
@@ -884,14 +745,14 @@
                     <h3 class="text-xl font-bold mb-6">Elite Developer Selection</h3>
                     <p class="text-soft-ice mb-6">Review the top 5% of student developer profiles, including earned badges and past project success rates.</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="developer-grid">
-                        <!-- Developer profiles will be loaded here -->
+                        <!-- Developer profiles loaded via JavaScript -->
                     </div>
                 </div>
             </div>
         </section>
-        
-        <!-- Developer Dashboard -->
-        <section id="developer-dashboard" class="min-h-screen pt-24 px-6 md:px-12 bg-gradient-to-b from-primary-dark to-surface-teal/20 hidden">
+
+        <!-- DEVELOPER DASHBOARD -->
+        <section id="developer-dashboard" class="page min-h-screen px-6 md:px-12">
             <div class="container mx-auto">
                 <div class="flex justify-between items-center mb-10">
                     <div>
@@ -899,7 +760,7 @@
                         <p class="text-soft-ice">Manage projects, showcase skills, and grow your commercial capital</p>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <button onclick="switchToLanding()" class="px-5 py-2 rounded-lg border border-accent-teal text-accent-teal hover:bg-accent-teal/10 transition-all duration-300">
+                        <button onclick="showPage('landing')" class="px-5 py-2 rounded-lg border border-accent-teal text-accent-teal hover:bg-accent-teal/10 transition-all duration-300">
                             <i class="fas fa-arrow-left mr-2"></i> Back to Home
                         </button>
                         <button onclick="refreshMarketplace()" class="px-5 py-2 rounded-lg bg-accent-teal text-primary-dark font-medium hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300">
@@ -915,7 +776,7 @@
                             <div id="dev-avatar" class="w-24 h-24 rounded-full gradient-accent flex items-center justify-center mb-4">
                                 <span class="font-bold text-primary-dark text-3xl">AJ</span>
                             </div>
-                            <h3 id="dev-name" class="text-xl font-bold">Loading...</h3>
+                            <h3 id="dev-name" class="text-xl font-bold">Aarav Jain</h3>
                             <p id="dev-role" class="text-soft-ice">Full Stack Developer</p>
                             <div class="flex items-center mt-2">
                                 <i class="fas fa-star text-yellow-400 text-sm mr-1"></i>
@@ -930,7 +791,7 @@
                         <div class="space-y-4 mb-6">
                             <div>
                                 <p class="text-soft-ice text-sm">Portfolio Link</p>
-                                <a href="#" id="dev-portfolio" class="text-accent-teal hover:underline break-all">Loading...</a>
+                                <a href="#" id="dev-portfolio" class="text-accent-teal hover:underline break-all">portfolio.aaravjain.dev</a>
                             </div>
                             <div>
                                 <p class="text-soft-ice text-sm">Strike Meter</p>
@@ -942,7 +803,9 @@
                             <div>
                                 <p class="text-soft-ice text-sm mb-2">Earned Badges</p>
                                 <div id="badge-container" class="flex flex-wrap gap-2">
-                                    <!-- Badges will be loaded here -->
+                                    <span class="badge badge-premium">UI Master</span>
+                                    <span class="badge badge-premium">Full Stack</span>
+                                    <span class="badge badge-premium">React Expert</span>
                                 </div>
                             </div>
                         </div>
@@ -968,7 +831,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="projects-table-body">
-                                    <!-- Projects will be loaded here -->
+                                    <!-- Projects loaded via JavaScript -->
                                 </tbody>
                             </table>
                         </div>
@@ -981,17 +844,17 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div class="glass-dark rounded-xl p-5">
                             <p class="text-soft-ice text-sm mb-2">Total Earnings</p>
-                            <p id="total-earnings" class="text-3xl font-bold text-accent-teal">$0</p>
+                            <p id="total-earnings" class="text-3xl font-bold text-accent-teal">$24,850</p>
                             <p class="text-soft-ice text-xs mt-2">Lifetime revenue</p>
                         </div>
                         <div class="glass-dark rounded-xl p-5">
                             <p class="text-soft-ice text-sm mb-2">Pending Payments</p>
-                            <p id="pending-payments" class="text-3xl font-bold text-accent-teal">$0</p>
+                            <p id="pending-payments" class="text-3xl font-bold text-accent-teal">$3,200</p>
                             <p class="text-soft-ice text-xs mt-2">Awaiting approval</p>
                         </div>
                         <div class="glass-dark rounded-xl p-5">
                             <p class="text-soft-ice text-sm mb-2">Avg. Project Value</p>
-                            <p id="avg-project-value" class="text-3xl font-bold text-accent-teal">$0</p>
+                            <p id="avg-project-value" class="text-3xl font-bold text-accent-teal">$2,750</p>
                             <p class="text-soft-ice text-xs mt-2">Last 6 projects</p>
                         </div>
                     </div>
@@ -1199,12 +1062,10 @@
                 <div>
                     <h4 class="text-lg font-bold mb-6">Platform</h4>
                     <ul class="space-y-3">
-                        <li><a href="#home" class="text-soft-ice hover:text-accent-teal transition-colors">Home</a></li>
-                        <li><a href="#difference" class="text-soft-ice hover:text-accent-teal transition-colors">The Difference</a></li>
-                        <li><a href="#services" class="text-soft-ice hover:text-accent-teal transition-colors">Services</a></li>
-                        <li><a href="#showcase" class="text-soft-ice hover:text-accent-teal transition-colors">Showcase</a></li>
-                        <li><button onclick="showHostDashboard()" class="text-soft-ice hover:text-accent-teal transition-colors">Host Dashboard</button></li>
-                        <li><button onclick="showDeveloperDashboard()" class="text-soft-ice hover:text-accent-teal transition-colors">Developer Dashboard</button></li>
+                        <li><a href="#" onclick="showPage('landing')" class="text-soft-ice hover:text-accent-teal transition-colors">Home</a></li>
+                        <li><a href="#difference" onclick="showPage('landing')" class="text-soft-ice hover:text-accent-teal transition-colors">The Difference</a></li>
+                        <li><a href="#services" onclick="showPage('landing')" class="text-soft-ice hover:text-accent-teal transition-colors">Services</a></li>
+                        <li><a href="#showcase" onclick="showPage('landing')" class="text-soft-ice hover:text-accent-teal transition-colors">Showcase</a></li>
                     </ul>
                 </div>
                 
@@ -1244,12 +1105,12 @@
                 <div class="space-y-6">
                     <div>
                         <label class="block text-soft-ice mb-2">Email Address</label>
-                        <input type="email" id="loginEmail" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal">
+                        <input type="email" id="loginEmail" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal" placeholder="you@example.com">
                     </div>
                     
                     <div>
                         <label class="block text-soft-ice mb-2">Password</label>
-                        <input type="password" id="loginPassword" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal">
+                        <input type="password" id="loginPassword" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal" placeholder="••••••••">
                     </div>
                     
                     <div class="flex items-center justify-between">
@@ -1260,7 +1121,7 @@
                         <a href="#" class="text-accent-teal text-sm hover:underline">Forgot password?</a>
                     </div>
                     
-                    <button onclick="loginWithEmail()" class="w-full py-3 rounded-lg bg-accent-teal text-primary-dark font-semibold hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300">
+                    <button onclick="simulateLogin()" class="w-full py-3 rounded-lg bg-accent-teal text-primary-dark font-semibold hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300">
                         Sign In
                     </button>
                     
@@ -1277,7 +1138,7 @@
                         <button onclick="loginWithGoogle()" class="py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-soft-ice hover:bg-surface-teal/40 transition-colors flex items-center justify-center">
                             <i class="fab fa-google mr-2"></i> Google
                         </button>
-                        <button onclick="loginWithGitHub()" id="githubLoginBtn" class="py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-soft-ice hover:bg-surface-teal/40 transition-colors flex items-center justify-center">
+                        <button onclick="loginWithGitHub()" class="py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-soft-ice hover:bg-surface-teal/40 transition-colors flex items-center justify-center">
                             <i class="fab fa-github mr-2"></i> GitHub
                         </button>
                     </div>
@@ -1294,22 +1155,22 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-soft-ice mb-2">First Name</label>
-                            <input type="text" id="signupFirstName" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal">
+                            <input type="text" id="signupFirstName" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal" placeholder="John">
                         </div>
                         <div>
                             <label class="block text-soft-ice mb-2">Last Name</label>
-                            <input type="text" id="signupLastName" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal">
+                            <input type="text" id="signupLastName" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal" placeholder="Doe">
                         </div>
                     </div>
                     
                     <div>
                         <label class="block text-soft-ice mb-2">Email Address</label>
-                        <input type="email" id="signupEmail" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal">
+                        <input type="email" id="signupEmail" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal" placeholder="you@example.com">
                     </div>
                     
                     <div>
                         <label class="block text-soft-ice mb-2">Password</label>
-                        <input type="password" id="signupPassword" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal">
+                        <input type="password" id="signupPassword" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal" placeholder="••••••••">
                     </div>
                     
                     <div>
@@ -1325,27 +1186,9 @@
                         <label for="terms" class="text-soft-ice text-sm">I agree to the <a href="#" class="text-accent-teal hover:underline">Terms of Service</a> and <a href="#" class="text-accent-teal hover:underline">Privacy Policy</a></label>
                     </div>
                     
-                    <button onclick="signupWithEmail()" class="w-full py-3 rounded-lg bg-accent-teal text-primary-dark font-semibold hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300">
+                    <button onclick="simulateSignup()" class="w-full py-3 rounded-lg bg-accent-teal text-primary-dark font-semibold hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300">
                         Create Account
                     </button>
-                    
-                    <div class="relative my-6">
-                        <div class="absolute inset-0 flex items-center">
-                            <div class="w-full border-t border-surface-teal/50"></div>
-                        </div>
-                        <div class="relative flex justify-center text-sm">
-                            <span class="px-4 bg-primary-dark text-soft-ice">Or sign up with</span>
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-4">
-                        <button onclick="signupWithGoogle()" class="py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-soft-ice hover:bg-surface-teal/40 transition-colors flex items-center justify-center">
-                            <i class="fab fa-google mr-2"></i> Google
-                        </button>
-                        <button onclick="signupWithGitHub()" id="githubSignupBtn" class="py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-soft-ice hover:bg-surface-teal/40 transition-colors flex items-center justify-center hidden">
-                            <i class="fab fa-github mr-2"></i> GitHub
-                        </button>
-                    </div>
                     
                     <p class="text-center text-soft-ice mt-6">
                         Already have an account? 
@@ -1371,14 +1214,13 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-soft-ice mb-2">Company Name *</label>
-                            <input type="text" id="editCompanyName" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal">
+                            <input type="text" id="editCompanyName" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal" value="TechNova Solutions">
                         </div>
                         <div>
                             <label class="block text-soft-ice mb-2">Industry *</label>
                             <select id="editIndustry" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal">
-                                <option value="">Select Industry</option>
+                                <option value="tech" selected>Technology</option>
                                 <option value="luxury-retail">Luxury Retail</option>
-                                <option value="tech">Technology</option>
                                 <option value="finance">Finance</option>
                                 <option value="healthcare">Healthcare</option>
                                 <option value="travel">Travel & Hospitality</option>
@@ -1417,7 +1259,7 @@
                     
                     <div>
                         <label class="block text-soft-ice mb-2">Business Description</label>
-                        <textarea id="editBusinessDesc" rows="4" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal"></textarea>
+                        <textarea id="editBusinessDesc" rows="4" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal">Leading technology solutions provider for enterprise clients.</textarea>
                     </div>
                     
                     <div class="flex justify-end space-x-4">
@@ -1432,13 +1274,12 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-soft-ice mb-2">Display Name *</label>
-                            <input type="text" id="editDevName" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal">
+                            <input type="text" id="editDevName" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal" value="Aarav Jain">
                         </div>
                         <div>
                             <label class="block text-soft-ice mb-2">Primary Role *</label>
                             <select id="editDevRole" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal">
-                                <option value="">Select Role</option>
-                                <option value="full-stack">Full Stack Developer</option>
+                                <option value="full-stack" selected>Full Stack Developer</option>
                                 <option value="frontend">Frontend Developer</option>
                                 <option value="backend">Backend Developer</option>
                                 <option value="ui-ux">UI/UX Designer</option>
@@ -1450,12 +1291,12 @@
                     
                     <div>
                         <label class="block text-soft-ice mb-2">Portfolio Website</label>
-                        <input type="url" id="editPortfolio" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal" placeholder="https://yourportfolio.com">
+                        <input type="url" id="editPortfolio" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal" placeholder="https://yourportfolio.com" value="https://portfolio.aaravjain.dev">
                     </div>
                     
                     <div>
                         <label class="block text-soft-ice mb-2">Technical Skills</label>
-                        <div class="flex flex-wrap gap-2 mb-4">
+                        <div class="flex flex-wrap gap-2 mb-4" id="skillTags">
                             <span class="skill-tag">JavaScript</span>
                             <span class="skill-tag">React</span>
                             <span class="skill-tag">Node.js</span>
@@ -1463,12 +1304,15 @@
                             <span class="skill-tag">UI/UX</span>
                             <span class="skill-tag">API Development</span>
                         </div>
-                        <input type="text" id="newSkill" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal" placeholder="Add a skill and press Enter">
+                        <div class="flex">
+                            <input type="text" id="newSkill" class="flex-grow px-4 py-3 rounded-l-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal" placeholder="Add a skill">
+                            <button type="button" onclick="addSkill()" class="px-4 py-3 rounded-r-lg bg-accent-teal text-primary-dark font-medium">Add</button>
+                        </div>
                     </div>
                     
                     <div>
                         <label class="block text-soft-ice mb-2">Professional Bio</label>
-                        <textarea id="editDevBio" rows="4" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal" placeholder="Describe your experience, projects, and career goals..."></textarea>
+                        <textarea id="editDevBio" rows="4" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-white focus:outline-none focus:border-accent-teal">Full-stack developer with expertise in modern web technologies. Passionate about building scalable applications and user-centric experiences.</textarea>
                     </div>
                     
                     <div class="flex justify-end space-x-4">
@@ -1505,22 +1349,34 @@
             measurementId: "G-0GY2JYKLHJ"
         };
         
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+        // Initialize Firebase (with error handling)
+        let firebaseInitialized = false;
+        let auth = null;
+        let db = null;
+        
+        try {
+            // Check if Firebase can be initialized in current environment
+            if (window.location.protocol === 'http:' || window.location.protocol === 'https:' || window.location.protocol === 'chrome-extension:') {
+                firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                db = firebase.firestore();
+                firebaseInitialized = true;
+                console.log("Firebase initialized successfully");
+            } else {
+                console.warn("Firebase cannot be initialized in this environment. Using simulation mode.");
+            }
+        } catch (error) {
+            console.warn("Firebase initialization failed. Using simulation mode.", error);
+        }
         
         // Global State
         let currentUser = null;
         let userType = null;
         let userData = null;
-        let testimonialIndex = 0;
-        let developerTestimonialIndex = 0;
+        let currentPage = 'landing';
         let selectedAccountType = 'host';
         
         // DOM Elements
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
         const authModal = document.getElementById('authModal');
         const loginForm = document.getElementById('loginForm');
         const signupForm = document.getElementById('signupForm');
@@ -1530,281 +1386,209 @@
         const hostProfileForm = document.getElementById('hostProfileForm');
         const developerProfileForm = document.getElementById('developerProfileForm');
         const successNotification = document.getElementById('successNotification');
-        const userInfo = document.getElementById('user-info');
-        const loginBtn = document.getElementById('login-btn');
-        const signupBtn = document.getElementById('signup-btn');
-        const mobileUserInfo = document.getElementById('mobile-user-info');
-        const mobileLoginBtn = document.getElementById('mobile-login-btn');
-        const mobileSignupBtn = document.getElementById('mobile-signup-btn');
-        const githubLoginBtn = document.getElementById('githubLoginBtn');
-        const githubSignupBtn = document.getElementById('githubSignupBtn');
+        const navLinks = document.getElementById('nav-links');
+        const navButtons = document.getElementById('nav-buttons');
         
         // Charts
-        let devChart, projectChart, supportChart, savingsChart;
-        let hostBudgetChart, timelineChart, earningsChart, paymentChart;
+        let devChart, projectChart;
+        let hostBudgetChart, earningsChart, paymentChart;
         
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
-            initMobileMenu();
-            initTestimonialSlider();
             initCharts();
-            setupAuthButtons();
-            setupFirebaseAuth();
             loadDeveloperProfiles();
             loadProjectsMarketplace();
+            updateNavigation();
+            hideProjectSubmissionForm();
+            
+            // Try to initialize Firebase auth state listener
+            if (firebaseInitialized && auth) {
+                setupFirebaseAuth();
+            } else {
+                // Use simulated auth state
+                checkSimulatedAuthState();
+            }
         });
         
-        // Firebase Authentication Setup
+        // Simulated Firebase Authentication
         function setupFirebaseAuth() {
+            if (!firebaseInitialized) return;
+            
             auth.onAuthStateChanged((user) => {
                 if (user) {
                     // User is signed in
                     currentUser = user;
                     
                     // Get user data from Firestore
-                    db.collection('users').doc(user.uid).get().then((doc) => {
-                        if (doc.exists) {
-                            userData = doc.data();
-                            userType = userData.userType;
-                            
-                            // Update UI based on user type
-                            updateUIForUser(user, userData);
-                            
-                            // Load appropriate dashboard data
-                            if (userType === 'host') {
-                                loadHostData();
-                            } else if (userType === 'developer') {
-                                loadDeveloperData();
+                    if (db) {
+                        db.collection('users').doc(user.uid).get().then((doc) => {
+                            if (doc.exists) {
+                                userData = doc.data();
+                                userType = userData.userType;
+                                updateNavigation();
+                                showNotification('Success', `Welcome back, ${user.displayName || user.email}!`);
                             }
-                        } else {
-                            // User document doesn't exist, create it
-                            createUserDocument(user);
-                        }
-                    }).catch((error) => {
-                        console.error("Error getting user document:", error);
-                        showNotification('Error', 'Failed to load user data.');
-                    });
+                        }).catch((error) => {
+                            console.error("Error getting user document:", error);
+                            // Use default user data
+                            userData = getDefaultUserData(user);
+                            userType = selectedAccountType;
+                            updateNavigation();
+                        });
+                    } else {
+                        // Use default user data
+                        userData = getDefaultUserData(user);
+                        userType = selectedAccountType;
+                        updateNavigation();
+                    }
                 } else {
                     // User is signed out
                     currentUser = null;
                     userType = null;
                     userData = null;
-                    updateUIForLoggedOut();
+                    updateNavigation();
                 }
             });
         }
         
-        // Create user document in Firestore
-        function createUserDocument(user) {
-            const userRef = db.collection('users').doc(user.uid);
-            
-            // Default user data
-            const userData = {
-                uid: user.uid,
-                email: user.email,
-                displayName: user.displayName || user.email.split('@')[0],
-                photoURL: user.photoURL || '',
+        // Check simulated auth state from localStorage
+        function checkSimulatedAuthState() {
+            const savedUser = localStorage.getItem('codenprofit_user');
+            if (savedUser) {
+                const user = JSON.parse(savedUser);
+                currentUser = user;
+                userData = user.userData || getDefaultUserData(user);
+                userType = user.userType || 'host';
+                updateNavigation();
+            }
+        }
+        
+        // Get default user data
+        function getDefaultUserData(user) {
+            return {
+                uid: user?.uid || 'simulated-uid',
+                email: user?.email || 'user@example.com',
+                displayName: user?.displayName || 'Demo User',
                 userType: selectedAccountType,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                companyName: 'TechNova Solutions',
+                industry: 'tech',
+                subscription: 'pro',
+                role: 'Full Stack Developer',
+                portfolio: 'https://portfolio.example.com',
+                badges: ['UI Master', 'Full Stack', 'React Expert'],
+                strikes: 0,
+                earnings: 24850,
+                pendingEarnings: 3200,
+                projectsCompleted: 8,
+                rating: 5.0
             };
-            
-            // Add type-specific fields
-            if (selectedAccountType === 'host') {
-                userData.companyName = 'My Company';
-                userData.industry = 'tech';
-                userData.subscription = 'pro';
-                userData.businessDesc = '';
-            } else if (selectedAccountType === 'developer') {
-                userData.role = 'Full Stack Developer';
-                userData.portfolio = '';
-                userData.bio = '';
-                userData.skills = ['JavaScript', 'React', 'Node.js'];
-                userData.badges = ['UI Master'];
-                userData.strikes = 0;
-                userData.earnings = 0;
-                userData.projectsCompleted = 0;
-                userData.rating = 5.0;
-            }
-            
-            userRef.set(userData).then(() => {
-                console.log("User document created successfully");
-                userData = userData;
-                updateUIForUser(user, userData);
-            }).catch((error) => {
-                console.error("Error creating user document:", error);
+        }
+        
+        // Page Navigation
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active', 'fade-in');
             });
-        }
-        
-        // Update user document
-        function updateUserDocument(updates) {
-            if (!currentUser) return;
             
-            const userRef = db.collection('users').doc(currentUser.uid);
-            updates.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
-            
-            userRef.update(updates).then(() => {
-                console.log("User document updated successfully");
-                // Update local user data
-                userData = { ...userData, ...updates };
-                showNotification('Success', 'Profile updated successfully!');
-            }).catch((error) => {
-                console.error("Error updating user document:", error);
-                showNotification('Error', 'Failed to update profile.');
-            });
-        }
-        
-        // Login with Email/Password
-        function loginWithEmail() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            
-            if (!email || !password) {
-                showNotification('Error', 'Please enter email and password.');
-                return;
+            // Show selected page
+            const targetPage = document.getElementById(`${pageId}-page`);
+            if (targetPage) {
+                targetPage.classList.add('active');
+                setTimeout(() => {
+                    targetPage.classList.add('fade-in');
+                }, 10);
+                currentPage = pageId;
+                
+                // Update navigation
+                updateNavigation();
+                
+                // Initialize charts if needed
+                if (pageId === 'host' && !hostBudgetChart) {
+                    initHostDashboardCharts();
+                } else if (pageId === 'developer' && !earningsChart) {
+                    initDeveloperDashboardCharts();
+                }
+                
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
-            
-            auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    closeAuthModal();
-                    showNotification('Success', 'Logged in successfully!');
-                })
-                .catch((error) => {
-                    console.error("Login error:", error);
-                    showNotification('Error', error.message);
-                });
         }
         
-        // Signup with Email/Password
-        function signupWithEmail() {
-            const firstName = document.getElementById('signupFirstName').value;
-            const lastName = document.getElementById('signupLastName').value;
-            const email = document.getElementById('signupEmail').value;
-            const password = document.getElementById('signupPassword').value;
-            const terms = document.getElementById('terms').checked;
+        // Update Navigation Bar
+        function updateNavigation() {
+            // Clear navigation
+            navLinks.innerHTML = '';
+            navButtons.innerHTML = '';
             
-            if (!firstName || !lastName || !email || !password) {
-                showNotification('Error', 'Please fill all required fields.');
-                return;
-            }
-            
-            if (!terms) {
-                showNotification('Error', 'Please agree to the terms and conditions.');
-                return;
-            }
-            
-            auth.createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    // Update user profile
-                    const user = userCredential.user;
-                    return user.updateProfile({
-                        displayName: `${firstName} ${lastName}`
-                    }).then(() => {
-                        closeAuthModal();
-                        showNotification('Success', 'Account created successfully!');
-                    });
-                })
-                .catch((error) => {
-                    console.error("Signup error:", error);
-                    showNotification('Error', error.message);
-                });
-        }
-        
-        // Login with Google
-        function loginWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            
-            auth.signInWithPopup(provider)
-                .then((result) => {
-                    closeAuthModal();
-                    showNotification('Success', 'Logged in with Google!');
-                })
-                .catch((error) => {
-                    console.error("Google login error:", error);
-                    showNotification('Error', error.message);
-                });
-        }
-        
-        // Login with GitHub (for developers)
-        function loginWithGitHub() {
-            const provider = new firebase.auth.GithubAuthProvider();
-            
-            auth.signInWithPopup(provider)
-                .then((result) => {
-                    closeAuthModal();
-                    showNotification('Success', 'Logged in with GitHub!');
-                })
-                .catch((error) => {
-                    console.error("GitHub login error:", error);
-                    showNotification('Error', error.message);
-                });
-        }
-        
-        // Signup with Google
-        function signupWithGoogle() {
-            loginWithGoogle(); // Same as login for OAuth providers
-        }
-        
-        // Signup with GitHub
-        function signupWithGitHub() {
-            loginWithGitHub(); // Same as login for OAuth providers
-        }
-        
-        // Logout
-        function logout() {
-            auth.signOut().then(() => {
-                showNotification('Success', 'Logged out successfully!');
-                switchToLanding();
-            }).catch((error) => {
-                console.error("Logout error:", error);
-                showNotification('Error', 'Failed to logout.');
-            });
-        }
-        
-        // Update UI for logged in user
-        function updateUIForUser(user, userData) {
-            const displayName = userData.displayName || user.email;
-            const firstName = displayName.split(' ')[0];
-            const initials = getInitials(displayName);
-            const userTypeDisplay = userData.userType === 'host' ? 'Host' : 'Developer';
-            
-            // Update desktop UI
-            document.getElementById('user-avatar').textContent = initials;
-            document.getElementById('user-name').textContent = firstName;
-            userInfo.classList.remove('hidden');
-            loginBtn.classList.add('hidden');
-            signupBtn.classList.add('hidden');
-            
-            // Update mobile UI
-            document.getElementById('mobile-user-avatar').textContent = initials;
-            document.getElementById('mobile-user-name').textContent = displayName;
-            document.getElementById('mobile-user-type').textContent = userTypeDisplay;
-            mobileUserInfo.classList.remove('hidden');
-            mobileLoginBtn.classList.add('hidden');
-            mobileSignupBtn.classList.add('hidden');
-            
-            // Show GitHub login option for developers
-            if (userData.userType === 'developer') {
-                githubLoginBtn.classList.remove('hidden');
-                githubSignupBtn.classList.remove('hidden');
+            if (currentUser) {
+                // User is logged in
+                const displayName = userData?.displayName || currentUser.email;
+                const initials = getInitials(displayName);
+                
+                // Navigation links based on page
+                if (currentPage === 'landing') {
+                    navLinks.innerHTML = `
+                        <a href="#difference" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">The Difference</a>
+                        <a href="#services" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Services</a>
+                        <a href="#showcase" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Showcase</a>
+                        <a href="#goal" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Our Goal</a>
+                        <a href="#testimonials" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Testimonials</a>
+                    `;
+                    
+                    // Dashboard button based on user type
+                    const dashboardBtn = document.createElement('button');
+                    dashboardBtn.className = 'px-5 py-2 rounded-lg border border-accent-teal text-accent-teal hover:bg-accent-teal/10 transition-all duration-300';
+                    dashboardBtn.innerHTML = userType === 'host' ? 
+                        '<i class="fas fa-building mr-2"></i> Host Dashboard' : 
+                        '<i class="fas fa-code mr-2"></i> Developer Dashboard';
+                    dashboardBtn.onclick = () => showPage(userType);
+                    
+                    navButtons.appendChild(dashboardBtn);
+                } else if (currentPage === 'host' || currentPage === 'developer') {
+                    navLinks.innerHTML = `
+                        <a href="#" onclick="showPage('landing')" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Home</a>
+                        <a href="#services" onclick="showPage('landing')" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Services</a>
+                        <a href="#showcase" onclick="showPage('landing')" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Showcase</a>
+                    `;
+                }
+                
+                // User info and logout button
+                const userInfo = document.createElement('div');
+                userInfo.className = 'flex items-center space-x-3';
+                userInfo.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-full gradient-accent flex items-center justify-center text-primary-dark font-semibold">${initials}</div>
+                        <span class="text-sm text-soft-ice hidden md:inline">${displayName.split(' ')[0]}</span>
+                    </div>
+                    <button onclick="logout()" class="px-4 py-1 rounded-lg border border-accent-teal text-accent-teal text-sm hover:bg-accent-teal/10 transition-all duration-300">Logout</button>
+                `;
+                
+                navButtons.appendChild(userInfo);
+                
             } else {
-                githubLoginBtn.classList.add('hidden');
-                githubSignupBtn.classList.add('hidden');
+                // User is not logged in
+                if (currentPage === 'landing') {
+                    navLinks.innerHTML = `
+                        <a href="#difference" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">The Difference</a>
+                        <a href="#services" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Services</a>
+                        <a href="#showcase" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Showcase</a>
+                        <a href="#goal" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Our Goal</a>
+                        <a href="#testimonials" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Testimonials</a>
+                    `;
+                } else {
+                    navLinks.innerHTML = `
+                        <a href="#" onclick="showPage('landing')" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Home</a>
+                        <a href="#services" onclick="showPage('landing')" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Services</a>
+                    `;
+                }
+                
+                // Login and signup buttons
+                navButtons.innerHTML = `
+                    <button onclick="showAuthModal('login')" class="px-5 py-2 rounded-lg border border-accent-teal text-accent-teal hover:bg-accent-teal/10 transition-all duration-300">Login</button>
+                    <button onclick="showAuthModal('signup')" class="px-5 py-2 rounded-lg bg-accent-teal text-primary-dark font-medium hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300 transform hover:scale-[1.03]">Join Movement</button>
+                `;
             }
-        }
-        
-        // Update UI for logged out user
-        function updateUIForLoggedOut() {
-            userInfo.classList.add('hidden');
-            loginBtn.classList.remove('hidden');
-            signupBtn.classList.remove('hidden');
-            
-            mobileUserInfo.classList.add('hidden');
-            mobileLoginBtn.classList.remove('hidden');
-            mobileSignupBtn.classList.remove('hidden');
-            
-            githubLoginBtn.classList.add('hidden');
-            githubSignupBtn.classList.add('hidden');
         }
         
         // Get initials from name
@@ -1812,269 +1596,182 @@
             return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
         }
         
-        // Mobile Menu Toggle
-        function initMobileMenu() {
-            mobileMenuBtn.addEventListener('click', function() {
-                mobileMenu.classList.toggle('hidden');
-            });
-            
-            // Close menu when clicking outside
-            document.addEventListener('click', function(event) {
-                if (!mobileMenu.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
-                    mobileMenu.classList.add('hidden');
-                }
-            });
-        }
-        
-        // Testimonial Slider
-        function initTestimonialSlider() {
-            const testimonials = document.querySelectorAll('.testimonial');
-            const dots = document.querySelectorAll('.testimonial-dot');
-            const prevBtn = document.querySelector('.testimonial-prev');
-            const nextBtn = document.querySelector('.testimonial-next');
-            
-            const developerTestimonials = document.querySelectorAll('.developer-testimonial');
-            const developerDots = document.querySelectorAll('.developer-testimonial-dot');
-            const developerPrevBtn = document.querySelector('.developer-testimonial-prev');
-            const developerNextBtn = document.querySelector('.developer-testimonial-next');
-            
-            function showTestimonial(index) {
-                testimonials.forEach(testimonial => testimonial.classList.add('hidden'));
-                dots.forEach(dot => dot.classList.replace('bg-accent-teal', 'bg-surface-teal/50'));
-                
-                testimonials[index].classList.remove('hidden');
-                dots[index].classList.replace('bg-surface-teal/50', 'bg-accent-teal');
-                testimonialIndex = index;
-            }
-            
-            function showDeveloperTestimonial(index) {
-                developerTestimonials.forEach(testimonial => testimonial.classList.add('hidden'));
-                developerDots.forEach(dot => dot.classList.replace('bg-accent-teal', 'bg-surface-teal/50'));
-                
-                developerTestimonials[index].classList.remove('hidden');
-                developerDots[index].classList.replace('bg-surface-teal/50', 'bg-accent-teal');
-                developerTestimonialIndex = index;
-            }
-            
-            prevBtn.addEventListener('click', function() {
-                let newIndex = testimonialIndex - 1;
-                if (newIndex < 0) newIndex = testimonials.length - 1;
-                showTestimonial(newIndex);
-            });
-            
-            nextBtn.addEventListener('click', function() {
-                let newIndex = testimonialIndex + 1;
-                if (newIndex >= testimonials.length) newIndex = 0;
-                showTestimonial(newIndex);
-            });
-            
-            developerPrevBtn.addEventListener('click', function() {
-                let newIndex = developerTestimonialIndex - 1;
-                if (newIndex < 0) newIndex = developerTestimonials.length - 1;
-                showDeveloperTestimonial(newIndex);
-            });
-            
-            developerNextBtn.addEventListener('click', function() {
-                let newIndex = developerTestimonialIndex + 1;
-                if (newIndex >= developerTestimonials.length) newIndex = 0;
-                showDeveloperTestimonial(newIndex);
-            });
-            
-            dots.forEach((dot, index) => {
-                dot.addEventListener('click', function() {
-                    showTestimonial(index);
-                });
-            });
-            
-            developerDots.forEach((dot, index) => {
-                dot.addEventListener('click', function() {
-                    showDeveloperTestimonial(index);
-                });
-            });
-            
-            // Auto-rotate testimonials every 5 seconds
-            setInterval(() => {
-                let newIndex = testimonialIndex + 1;
-                if (newIndex >= testimonials.length) newIndex = 0;
-                showTestimonial(newIndex);
-            }, 5000);
-            
-            // Auto-rotate developer testimonials every 7 seconds
-            setInterval(() => {
-                let newIndex = developerTestimonialIndex + 1;
-                if (newIndex >= developerTestimonials.length) newIndex = 0;
-                showDeveloperTestimonial(newIndex);
-            }, 7000);
-        }
-        
         // Initialize Charts
         function initCharts() {
             // Power Metrics Charts
-            const devCtx = document.getElementById('devChart').getContext('2d');
-            devChart = new Chart(devCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [{
-                        label: 'Developers',
-                        data: [50, 75, 100, 120, 140, 150],
-                        borderColor: '#3AAFA9',
-                        backgroundColor: 'rgba(58, 175, 169, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { 
-                            grid: { color: 'rgba(222, 242, 241, 0.1)' },
-                            ticks: { color: '#DEF2F1' }
-                        },
-                        y: { 
-                            grid: { color: 'rgba(222, 242, 241, 0.1)' },
-                            ticks: { color: '#DEF2F1' }
+            const devCtx = document.getElementById('devChart')?.getContext('2d');
+            if (devCtx) {
+                devChart = new Chart(devCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Developers',
+                            data: [50, 75, 100, 120, 140, 150],
+                            borderColor: '#3AAFA9',
+                            backgroundColor: 'rgba(58, 175, 169, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { 
+                                grid: { color: 'rgba(222, 242, 241, 0.1)' },
+                                ticks: { color: '#DEF2F1' }
+                            },
+                            y: { 
+                                grid: { color: 'rgba(222, 242, 241, 0.1)' },
+                                ticks: { color: '#DEF2F1' }
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
             
-            const projectCtx = document.getElementById('projectChart').getContext('2d');
-            projectChart = new Chart(projectCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [{
-                        label: 'Projects',
-                        data: [10, 18, 25, 35, 42, 50],
-                        backgroundColor: 'rgba(58, 175, 169, 0.7)',
-                        borderColor: '#3AAFA9',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { 
-                            grid: { color: 'rgba(222, 242, 241, 0.1)' },
-                            ticks: { color: '#DEF2F1' }
-                        },
-                        y: { 
-                            grid: { color: 'rgba(222, 242, 241, 0.1)' },
-                            ticks: { color: '#DEF2F1' }
+            const projectCtx = document.getElementById('projectChart')?.getContext('2d');
+            if (projectCtx) {
+                projectChart = new Chart(projectCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Projects',
+                            data: [10, 18, 25, 35, 42, 50],
+                            backgroundColor: 'rgba(58, 175, 169, 0.7)',
+                            borderColor: '#3AAFA9',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { 
+                                grid: { color: 'rgba(222, 242, 241, 0.1)' },
+                                ticks: { color: '#DEF2F1' }
+                            },
+                            y: { 
+                                grid: { color: 'rgba(222, 242, 241, 0.1)' },
+                                ticks: { color: '#DEF2F1' }
+                            }
                         }
                     }
-                }
-            });
-            
-            // Dashboard Charts (will be initialized when needed)
+                });
+            }
         }
         
-        // Initialize Dashboard Charts
-        function initDashboardCharts() {
-            // Host Budget Chart
-            const budgetCtx = document.getElementById('hostBudgetChart').getContext('2d');
-            hostBudgetChart = new Chart(budgetCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Development', 'Design', 'Testing', 'Maintenance'],
-                    datasets: [{
-                        data: [45, 25, 20, 10],
-                        backgroundColor: ['#3AAFA9', '#2B7A78', '#17252A', '#DEF2F1'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { 
-                            display: true,
-                            labels: { color: '#DEF2F1' }
-                        }
+        // Initialize Host Dashboard Charts
+        function initHostDashboardCharts() {
+            const budgetCtx = document.getElementById('hostBudgetChart')?.getContext('2d');
+            if (budgetCtx) {
+                hostBudgetChart = new Chart(budgetCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Development', 'Design', 'Testing', 'Maintenance'],
+                        datasets: [{
+                            data: [45, 25, 20, 10],
+                            backgroundColor: ['#3AAFA9', '#2B7A78', '#17252A', '#DEF2F1'],
+                            borderWidth: 0
+                        }]
                     },
-                    cutout: '60%'
-                }
-            });
-            
-            // Developer Earnings Chart
-            const earningsCtx = document.getElementById('earningsChart').getContext('2d');
-            earningsChart = new Chart(earningsCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-                    datasets: [{
-                        label: 'Earnings ($)',
-                        data: [1200, 1800, 2200, 2800, 3200, 3800, 4500],
-                        borderColor: '#3AAFA9',
-                        backgroundColor: 'rgba(58, 175, 169, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { 
-                            labels: { color: '#DEF2F1' }
-                        }
-                    },
-                    scales: {
-                        x: { 
-                            grid: { color: 'rgba(222, 242, 241, 0.1)' },
-                            ticks: { color: '#DEF2F1' }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { 
+                                display: true,
+                                labels: { color: '#DEF2F1' }
+                            }
                         },
-                        y: { 
-                            grid: { color: 'rgba(222, 242, 241, 0.1)' },
-                            ticks: { 
-                                color: '#DEF2F1',
-                                callback: function(value) {
-                                    return '$' + value;
+                        cutout: '60%'
+                    }
+                });
+            }
+        }
+        
+        // Initialize Developer Dashboard Charts
+        function initDeveloperDashboardCharts() {
+            const earningsCtx = document.getElementById('earningsChart')?.getContext('2d');
+            if (earningsCtx) {
+                earningsChart = new Chart(earningsCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                        datasets: [{
+                            label: 'Earnings ($)',
+                            data: [1200, 1800, 2200, 2800, 3200, 3800, 4500],
+                            borderColor: '#3AAFA9',
+                            backgroundColor: 'rgba(58, 175, 169, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { 
+                            legend: { 
+                                labels: { color: '#DEF2F1' }
+                            }
+                        },
+                        scales: {
+                            x: { 
+                                grid: { color: 'rgba(222, 242, 241, 0.1)' },
+                                ticks: { color: '#DEF2F1' }
+                            },
+                            y: { 
+                                grid: { color: 'rgba(222, 242, 241, 0.1)' },
+                                ticks: { 
+                                    color: '#DEF2F1',
+                                    callback: function(value) {
+                                        return '$' + value;
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            });
+                });
+            }
             
-            // Developer Payment Chart
-            const paymentCtx = document.getElementById('paymentChart').getContext('2d');
-            paymentChart = new Chart(paymentCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Paid', 'Pending', 'Upcoming'],
-                    datasets: [{
-                        data: [65, 20, 15],
-                        backgroundColor: ['#3AAFA9', '#2B7A78', '#17252A'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { 
-                            display: true,
-                            labels: { color: '#DEF2F1' }
-                        }
+            const paymentCtx = document.getElementById('paymentChart')?.getContext('2d');
+            if (paymentCtx) {
+                paymentChart = new Chart(paymentCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Paid', 'Pending', 'Upcoming'],
+                        datasets: [{
+                            data: [65, 20, 15],
+                            backgroundColor: ['#3AAFA9', '#2B7A78', '#17252A'],
+                            borderWidth: 0
+                        }]
                     },
-                    cutout: '60%'
-                }
-            });
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { 
+                                display: true,
+                                labels: { color: '#DEF2F1' }
+                            }
+                        },
+                        cutout: '60%'
+                    }
+                });
+            }
         }
         
         // Load Developer Profiles for Host Dashboard
         function loadDeveloperProfiles() {
             const developerGrid = document.getElementById('developer-grid');
+            if (!developerGrid) return;
             
-            // Sample developer data
             const developers = [
                 {
                     id: 1,
@@ -2137,7 +1834,7 @@
                             <p class="text-sm text-soft-ice">Success Rate</p>
                             <p class="font-bold text-accent-teal">${dev.successRate}%</p>
                         </div>
-                        <button class="px-4 py-2 rounded-lg bg-accent-teal text-primary-dark text-sm font-medium hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300">Select</button>
+                        <button onclick="selectDeveloper(${dev.id})" class="px-4 py-2 rounded-lg bg-accent-teal text-primary-dark text-sm font-medium hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300">Select</button>
                     </div>
                 `;
                 developerGrid.appendChild(devCard);
@@ -2147,8 +1844,8 @@
         // Load Projects Marketplace for Developer Dashboard
         function loadProjectsMarketplace() {
             const tableBody = document.getElementById('projects-table-body');
+            if (!tableBody) return;
             
-            // Sample projects data
             const projects = [
                 {
                     id: 1,
@@ -2206,109 +1903,6 @@
             });
         }
         
-        // Load Host Data
-        function loadHostData() {
-            if (!userData) return;
-            
-            // Update host profile info
-            document.getElementById('host-company-name').textContent = userData.companyName || 'My Company';
-            document.getElementById('host-industry').textContent = formatIndustry(userData.industry);
-            document.getElementById('host-subscription').textContent = formatSubscription(userData.subscription);
-            
-            // Initialize charts if not already done
-            if (!hostBudgetChart) {
-                initDashboardCharts();
-            }
-        }
-        
-        // Load Developer Data
-        function loadDeveloperData() {
-            if (!userData) return;
-            
-            // Update developer profile
-            document.getElementById('dev-avatar').textContent = getInitials(userData.displayName);
-            document.getElementById('dev-name').textContent = userData.displayName;
-            document.getElementById('dev-role').textContent = formatRole(userData.role);
-            document.getElementById('dev-rating').textContent = userData.rating || '5.0';
-            document.getElementById('dev-portfolio').textContent = userData.portfolio || 'Add portfolio link';
-            document.getElementById('dev-portfolio').href = userData.portfolio || '#';
-            
-            // Update strike meter
-            const strikes = userData.strikes || 0;
-            const strikeFill = document.getElementById('strike-fill');
-            const strikeStatus = document.getElementById('strike-status');
-            
-            if (strikes === 0) {
-                strikeFill.className = 'strike-fill strike-safe';
-                strikeFill.style.width = '100%';
-                strikeStatus.textContent = 'Clean record - 0 strikes';
-            } else if (strikes === 1) {
-                strikeFill.className = 'strike-fill strike-warning';
-                strikeFill.style.width = '66%';
-                strikeStatus.textContent = '1 strike - Warning issued';
-            } else {
-                strikeFill.className = 'strike-fill strike-danger';
-                strikeFill.style.width = '33%';
-                strikeStatus.textContent = `${strikes} strikes - Final warning`;
-            }
-            
-            // Update badges
-            const badgeContainer = document.getElementById('badge-container');
-            const badges = userData.badges || ['UI Master'];
-            badgeContainer.innerHTML = badges.map(badge => `<span class="badge badge-premium">${badge}</span>`).join('');
-            
-            // Update earnings
-            const earnings = userData.earnings || 0;
-            const pending = userData.pendingEarnings || 0;
-            const avgProject = earnings > 0 ? Math.round(earnings / (userData.projectsCompleted || 1)) : 0;
-            
-            document.getElementById('total-earnings').textContent = `$${earnings.toLocaleString()}`;
-            document.getElementById('pending-payments').textContent = `$${pending.toLocaleString()}`;
-            document.getElementById('avg-project-value').textContent = `$${avgProject.toLocaleString()}`;
-            
-            // Initialize charts if not already done
-            if (!earningsChart) {
-                initDashboardCharts();
-            }
-        }
-        
-        // Format industry for display
-        function formatIndustry(industry) {
-            const industryMap = {
-                'luxury-retail': 'Luxury Retail',
-                'tech': 'Technology',
-                'finance': 'Finance',
-                'healthcare': 'Healthcare',
-                'travel': 'Travel & Hospitality',
-                'education': 'Education',
-                'other': 'Other'
-            };
-            return industryMap[industry] || 'Technology';
-        }
-        
-        // Format subscription for display
-        function formatSubscription(subscription) {
-            const subscriptionMap = {
-                'basic': 'Basic ($99/month)',
-                'pro': 'Pro ($299/month)',
-                'elite': 'Elite ($599/month)'
-            };
-            return subscriptionMap[subscription] || 'Pro ($299/month)';
-        }
-        
-        // Format role for display
-        function formatRole(role) {
-            const roleMap = {
-                'full-stack': 'Full Stack Developer',
-                'frontend': 'Frontend Developer',
-                'backend': 'Backend Developer',
-                'ui-ux': 'UI/UX Designer',
-                'devops': 'DevOps Engineer',
-                'ai-ml': 'AI/ML Specialist'
-            };
-            return roleMap[role] || 'Full Stack Developer';
-        }
-        
         // Auth Modal Functions
         function showAuthModal(type) {
             authModal.classList.remove('hidden');
@@ -2317,16 +1911,11 @@
                 authModalTitle.textContent = 'Sign In to Codenprofit';
                 loginForm.classList.remove('hidden');
                 signupForm.classList.add('hidden');
-                
-                // Show GitHub button for login (available for all)
-                githubLoginBtn.classList.remove('hidden');
             } else {
                 authModalTitle.textContent = 'Join the Movement';
                 loginForm.classList.add('hidden');
                 signupForm.classList.remove('hidden');
-                
-                // Show GitHub button only for developer signup
-                githubSignupBtn.classList.add('hidden');
+                selectAccountType('host'); // Default to host
             }
         }
         
@@ -2343,109 +1932,126 @@
                 
                 document.getElementById('devType').classList.add('bg-surface-teal/30', 'border', 'border-surface-teal/50', 'text-soft-ice');
                 document.getElementById('devType').classList.remove('bg-accent-teal', 'text-primary-dark');
-                
-                // Hide GitHub signup for hosts
-                githubSignupBtn.classList.add('hidden');
             } else {
                 document.getElementById('devType').classList.add('bg-accent-teal', 'text-primary-dark');
                 document.getElementById('devType').classList.remove('bg-surface-teal/30', 'text-soft-ice', 'border', 'border-surface-teal/50');
                 
                 document.getElementById('hostType').classList.add('bg-surface-teal/30', 'border', 'border-surface-teal/50', 'text-soft-ice');
                 document.getElementById('hostType').classList.remove('bg-accent-teal', 'text-primary-dark');
-                
-                // Show GitHub signup for developers
-                githubSignupBtn.classList.remove('hidden');
             }
         }
         
-        function setupAuthButtons() {
-            // Close modal when clicking outside
-            authModal.addEventListener('click', function(event) {
-                if (event.target === authModal) {
-                    closeAuthModal();
-                }
-            });
+        // Simulated Authentication Functions
+        function simulateLogin() {
+            const email = document.getElementById('loginEmail').value || 'demo@example.com';
+            const password = document.getElementById('loginPassword').value || 'password';
             
-            // Close profile modal when clicking outside
-            profileModal.addEventListener('click', function(event) {
-                if (event.target === profileModal) {
-                    closeProfileModal();
-                }
-            });
-        }
-        
-        // Profile Modal Functions
-        function editHostProfile() {
-            if (!userData) return;
+            if (!email) {
+                showNotification('Error', 'Please enter email address.');
+                return;
+            }
             
-            profileModalTitle.textContent = 'Edit Business Profile';
-            hostProfileForm.classList.remove('hidden');
-            developerProfileForm.classList.add('hidden');
-            profileModal.classList.remove('hidden');
-            
-            // Populate form with current data
-            document.getElementById('editCompanyName').value = userData.companyName || '';
-            document.getElementById('editIndustry').value = userData.industry || 'tech';
-            document.getElementById('editBusinessDesc').value = userData.businessDesc || '';
-            
-            // Set subscription radio
-            const subscription = userData.subscription || 'pro';
-            document.getElementById(`plan-${subscription}`).checked = true;
-        }
-        
-        function editDeveloperProfile() {
-            if (!userData) return;
-            
-            profileModalTitle.textContent = 'Edit Developer Profile';
-            developerProfileForm.classList.remove('hidden');
-            hostProfileForm.classList.add('hidden');
-            profileModal.classList.remove('hidden');
-            
-            // Populate form with current data
-            document.getElementById('editDevName').value = userData.displayName || '';
-            document.getElementById('editDevRole').value = userData.role || 'full-stack';
-            document.getElementById('editPortfolio').value = userData.portfolio || '';
-            document.getElementById('editDevBio').value = userData.bio || '';
-        }
-        
-        function closeProfileModal() {
-            profileModal.classList.add('hidden');
-        }
-        
-        // Handle form submissions
-        document.getElementById('hostProfileUpdateForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const updates = {
-                companyName: document.getElementById('editCompanyName').value,
-                industry: document.getElementById('editIndustry').value,
-                subscription: document.querySelector('input[name="subscription"]:checked').value,
-                businessDesc: document.getElementById('editBusinessDesc').value
+            // Simulate user
+            const user = {
+                uid: 'simulated-user-' + Date.now(),
+                email: email,
+                displayName: email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1)
             };
             
-            updateUserDocument(updates);
-            closeProfileModal();
+            currentUser = user;
+            userType = selectedAccountType;
+            userData = getDefaultUserData(user);
             
-            // Update UI
-            loadHostData();
-        });
+            // Save to localStorage for persistence
+            localStorage.setItem('codenprofit_user', JSON.stringify({
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName,
+                userType: userType,
+                userData: userData
+            }));
+            
+            closeAuthModal();
+            updateNavigation();
+            showNotification('Success', `Welcome back, ${user.displayName}!`);
+            
+            // Redirect to appropriate dashboard
+            setTimeout(() => {
+                showPage(userType);
+            }, 1000);
+        }
         
-        document.getElementById('developerProfileUpdateForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        function simulateSignup() {
+            const firstName = document.getElementById('signupFirstName').value || 'Demo';
+            const lastName = document.getElementById('signupLastName').value || 'User';
+            const email = document.getElementById('signupEmail').value || 'demo@example.com';
+            const password = document.getElementById('signupPassword').value || 'password';
+            const terms = document.getElementById('terms').checked;
             
-            const updates = {
-                displayName: document.getElementById('editDevName').value,
-                role: document.getElementById('editDevRole').value,
-                portfolio: document.getElementById('editPortfolio').value,
-                bio: document.getElementById('editDevBio').value
+            if (!firstName || !lastName || !email) {
+                showNotification('Error', 'Please fill all required fields.');
+                return;
+            }
+            
+            if (!terms) {
+                showNotification('Error', 'Please agree to the terms and conditions.');
+                return;
+            }
+            
+            // Simulate user creation
+            const user = {
+                uid: 'simulated-user-' + Date.now(),
+                email: email,
+                displayName: `${firstName} ${lastName}`
             };
             
-            updateUserDocument(updates);
-            closeProfileModal();
+            currentUser = user;
+            userType = selectedAccountType;
+            userData = getDefaultUserData(user);
             
-            // Update UI
-            loadDeveloperData();
-        });
+            // Save to localStorage for persistence
+            localStorage.setItem('codenprofit_user', JSON.stringify({
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName,
+                userType: userType,
+                userData: userData
+            }));
+            
+            closeAuthModal();
+            updateNavigation();
+            showNotification('Success', `Account created successfully, ${firstName}!`);
+            
+            // Redirect to appropriate dashboard
+            setTimeout(() => {
+                showPage(userType);
+            }, 1000);
+        }
+        
+        function loginWithGoogle() {
+            showNotification('Info', 'Google login would be implemented with Firebase in production.');
+            // For demo, simulate login
+            simulateLogin();
+        }
+        
+        function loginWithGitHub() {
+            showNotification('Info', 'GitHub login would be implemented with Firebase in production.');
+            // For demo, simulate login
+            simulateLogin();
+        }
+        
+        function logout() {
+            currentUser = null;
+            userType = null;
+            userData = null;
+            
+            // Remove from localStorage
+            localStorage.removeItem('codenprofit_user');
+            
+            updateNavigation();
+            showPage('landing');
+            showNotification('Success', 'Logged out successfully!');
+        }
         
         // Project Submission Form
         function showProjectSubmissionForm() {
@@ -2457,115 +2063,137 @@
             document.getElementById('projectForm').reset();
         }
         
-        document.getElementById('projectForm').addEventListener('submit', function(e) {
+        // Handle project form submission
+        document.getElementById('projectForm')?.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const projectData = {
-                name: document.getElementById('projectName').value,
-                industry: document.getElementById('projectIndustry').value,
-                budget: parseInt(document.getElementById('projectBudget').value),
-                vision: document.getElementById('projectVision').value,
-                status: 'submitted',
-                createdAt: new Date().toISOString(),
-                hostId: currentUser.uid,
-                hostName: userData.displayName
-            };
+            const projectName = document.getElementById('projectName').value;
+            const projectIndustry = document.getElementById('projectIndustry').value;
+            const projectBudget = document.getElementById('projectBudget').value;
+            const projectVision = document.getElementById('projectVision').value;
             
-            // Save project to Firestore
-            db.collection('projects').add(projectData)
-                .then((docRef) => {
-                    showNotification('Success', 'Project submitted successfully!');
-                    hideProjectSubmissionForm();
-                    
-                    // Add to host's projects list
-                    db.collection('users').doc(currentUser.uid).update({
-                        projects: firebase.firestore.FieldValue.arrayUnion(docRef.id)
-                    });
-                })
-                .catch((error) => {
-                    console.error("Error adding project: ", error);
-                    showNotification('Error', 'Failed to submit project.');
-                });
+            if (!projectName || !projectIndustry || !projectBudget || !projectVision) {
+                showNotification('Error', 'Please fill all required fields.');
+                return;
+            }
+            
+            showNotification('Success', `Project "${projectName}" submitted successfully!`);
+            hideProjectSubmissionForm();
+            
+            // In a real app, this would save to Firestore
+            console.log('Project submitted:', {
+                name: projectName,
+                industry: projectIndustry,
+                budget: projectBudget,
+                vision: projectVision,
+                timestamp: new Date().toISOString()
+            });
         });
         
-        // Dashboard Navigation
-        function showHostDashboard() {
-            if (!currentUser || userType !== 'host') {
-                showAuthModal('login');
-                showNotification('Info', 'Please login as a host to access the dashboard.');
-                return;
-            }
-            
-            document.getElementById('home').style.display = 'none';
-            document.getElementById('host-dashboard').classList.remove('hidden');
-            document.getElementById('developer-dashboard').classList.add('hidden');
-            
-            // Initialize dashboard charts if not already done
-            if (!hostBudgetChart) {
-                initDashboardCharts();
-            }
-            
-            // Load host data
-            loadHostData();
-            
-            // Scroll to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Profile Modal Functions
+        function editHostProfile() {
+            profileModalTitle.textContent = 'Edit Business Profile';
+            hostProfileForm.classList.remove('hidden');
+            developerProfileForm.classList.add('hidden');
+            profileModal.classList.remove('hidden');
         }
         
-        function showDeveloperDashboard() {
-            if (!currentUser || userType !== 'developer') {
-                showAuthModal('login');
-                showNotification('Info', 'Please login as a developer to access the dashboard.');
-                return;
-            }
-            
-            document.getElementById('home').style.display = 'none';
-            document.getElementById('developer-dashboard').classList.remove('hidden');
-            document.getElementById('host-dashboard').classList.add('hidden');
-            
-            // Initialize dashboard charts if not already done
-            if (!earningsChart) {
-                initDashboardCharts();
-            }
-            
-            // Load developer data
-            loadDeveloperData();
-            
-            // Scroll to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        function editDeveloperProfile() {
+            profileModalTitle.textContent = 'Edit Developer Profile';
+            developerProfileForm.classList.remove('hidden');
+            hostProfileForm.classList.add('hidden');
+            profileModal.classList.remove('hidden');
         }
         
-        function switchToLanding() {
-            document.getElementById('home').style.display = 'block';
-            document.getElementById('host-dashboard').classList.add('hidden');
-            document.getElementById('developer-dashboard').classList.add('hidden');
-            
-            // Scroll to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        function closeProfileModal() {
+            profileModal.classList.add('hidden');
         }
         
-        // Project Functions
-        function claimProject(projectId) {
-            if (!currentUser || userType !== 'developer') {
-                showNotification('Error', 'Please login as a developer to claim projects.');
-                return;
+        function addSkill() {
+            const newSkillInput = document.getElementById('newSkill');
+            const skillText = newSkillInput.value.trim();
+            
+            if (skillText) {
+                const skillTags = document.getElementById('skillTags');
+                const skillTag = document.createElement('span');
+                skillTag.className = 'skill-tag';
+                skillTag.textContent = skillText;
+                skillTags.appendChild(skillTag);
+                newSkillInput.value = '';
             }
-            
-            // In a real app, this would update the project in Firestore
-            showNotification('Success', `Project claimed successfully! You will be contacted by our team shortly.`);
-            
-            // Update developer's claimed projects
-            db.collection('users').doc(currentUser.uid).update({
-                claimedProjects: firebase.firestore.FieldValue.arrayUnion(projectId)
-            });
         }
         
-        function refreshMarketplace() {
-            loadProjectsMarketplace();
-            showNotification('Info', 'Marketplace refreshed with latest projects.');
-        }
+        // Handle profile form submissions
+        document.getElementById('hostProfileUpdateForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const companyName = document.getElementById('editCompanyName').value;
+            const industry = document.getElementById('editIndustry').value;
+            const subscription = document.querySelector('input[name="subscription"]:checked').value;
+            const businessDesc = document.getElementById('editBusinessDesc').value;
+            
+            // Update displayed values
+            document.getElementById('host-company-name').textContent = companyName;
+            document.getElementById('host-industry').textContent = formatIndustry(industry);
+            document.getElementById('host-subscription').textContent = formatSubscription(subscription);
+            
+            closeProfileModal();
+            showNotification('Success', 'Business profile updated successfully!');
+        });
+        
+        document.getElementById('developerProfileUpdateForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const devName = document.getElementById('editDevName').value;
+            const devRole = document.getElementById('editDevRole').value;
+            const portfolio = document.getElementById('editPortfolio').value;
+            const devBio = document.getElementById('editDevBio').value;
+            
+            // Update displayed values
+            document.getElementById('dev-name').textContent = devName;
+            document.getElementById('dev-role').textContent = formatRole(devRole);
+            document.getElementById('dev-portfolio').textContent = portfolio || 'Add portfolio link';
+            document.getElementById('dev-portfolio').href = portfolio || '#';
+            
+            closeProfileModal();
+            showNotification('Success', 'Developer profile updated successfully!');
+        });
         
         // Utility Functions
+        function formatIndustry(industry) {
+            const industryMap = {
+                'luxury-retail': 'Luxury Retail',
+                'tech': 'Technology',
+                'finance': 'Finance',
+                'healthcare': 'Healthcare',
+                'travel': 'Travel & Hospitality',
+                'education': 'Education',
+                'other': 'Other'
+            };
+            return industryMap[industry] || 'Technology';
+        }
+        
+        function formatSubscription(subscription) {
+            const subscriptionMap = {
+                'basic': 'Basic ($99/month)',
+                'pro': 'Pro ($299/month)',
+                'elite': 'Elite ($599/month)'
+            };
+            return subscriptionMap[subscription] || 'Pro ($299/month)';
+        }
+        
+        function formatRole(role) {
+            const roleMap = {
+                'full-stack': 'Full Stack Developer',
+                'frontend': 'Frontend Developer',
+                'backend': 'Backend Developer',
+                'ui-ux': 'UI/UX Designer',
+                'devops': 'DevOps Engineer',
+                'ai-ml': 'AI/ML Specialist'
+            };
+            return roleMap[role] || 'Full Stack Developer';
+        }
+        
         function showNotification(title, message) {
             document.getElementById('notificationTitle').textContent = title;
             document.getElementById('notificationMessage').textContent = message;
@@ -2593,28 +2221,58 @@
             });
         }
         
+        // Project Functions
+        function selectDeveloper(devId) {
+            showNotification('Success', `Developer selected! Our team will connect you shortly.`);
+        }
+        
+        function claimProject(projectId) {
+            if (!currentUser) {
+                showNotification('Error', 'Please login to claim projects.');
+                showAuthModal('login');
+                return;
+            }
+            
+            showNotification('Success', `Project claimed successfully! You will be contacted by our team shortly.`);
+        }
+        
+        function refreshMarketplace() {
+            loadProjectsMarketplace();
+            showNotification('Info', 'Marketplace refreshed with latest projects.');
+        }
+        
         function showSecuritySettings() {
             showNotification('Info', 'Security settings would open here in a full implementation.');
         }
         
-        // Add smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                const targetId = this.getAttribute('href');
+        // Add smooth scroll for anchor links on landing page
+        document.addEventListener('click', function(e) {
+            if (e.target.matches('a[href^="#"]') && currentPage === 'landing') {
+                e.preventDefault();
+                const targetId = e.target.getAttribute('href');
                 if (targetId === '#') return;
                 
                 const targetElement = document.querySelector(targetId);
                 if (targetElement) {
-                    e.preventDefault();
                     window.scrollTo({
                         top: targetElement.offsetTop - 100,
                         behavior: 'smooth'
                     });
-                    
-                    // Close mobile menu if open
-                    mobileMenu.classList.add('hidden');
                 }
-            });
+            }
+        });
+        
+        // Close modals when clicking outside
+        authModal.addEventListener('click', function(event) {
+            if (event.target === authModal) {
+                closeAuthModal();
+            }
+        });
+        
+        profileModal.addEventListener('click', function(event) {
+            if (event.target === profileModal) {
+                closeProfileModal();
+            }
         });
     </script>
 </body>
