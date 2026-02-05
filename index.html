@@ -185,6 +185,31 @@
             font-size: 12px;
             margin: 2px;
         }
+        
+        .strike-meter {
+            width: 100%;
+            height: 6px;
+            background: rgba(222, 242, 241, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .strike-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+        
+        .strike-safe {
+            background: var(--accent-teal);
+        }
+        
+        .strike-warning {
+            background: #f59e0b;
+        }
+        
+        .strike-danger {
+            background: #ef4444;
+        }
     </style>
 </head>
 <body class="bg-primary-dark text-pure-blue">
@@ -192,10 +217,10 @@
     <nav class="glass-dark fixed top-0 left-0 right-0 z-50 py-4 px-6 md:px-12">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-2">
-                <div class="w-10 h-10 rounded-full gradient-accent flex items-center justify-center cursor-pointer" onclick="showPage('landing')">
+                <div class="w-10 h-10 rounded-full gradient-accent flex items-center justify-center cursor-pointer" onclick="showPage('landing')" role="button" aria-label="Go to Home">
                     <span class="font-orbitron font-bold text-primary-dark text-lg">C</span>
                 </div>
-                <span class="font-orbitron text-2xl font-bold text-accent-teal tracking-wider cursor-pointer" onclick="showPage('landing')">CODENPROFIT</span>
+                <span class="font-orbitron text-2xl font-bold text-accent-teal tracking-wider cursor-pointer" onclick="showPage('landing')" role="button" aria-label="Go to Home">CODENPROFIT</span>
             </div>
             
             <div class="hidden md:flex items-center space-x-8" id="nav-links">
@@ -639,16 +664,16 @@
                 </div>
                 
                 <!-- Project Submission Form -->
-                <div id="project-submission-form" class="glass-effect rounded-xl p-6 mb-10">
+                <div id="project-submission-form" class="glass-effect rounded-xl p-6 mb-10 hidden">
                     <h3 class="text-2xl font-bold mb-6">New Project Submission</h3>
                     <form id="projectForm" class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-soft-ice mb-2">Project Name *</label>
+                                <label for="projectName" class="block text-soft-ice mb-2">Project Name *</label>
                                 <input type="text" id="projectName" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" placeholder="E-commerce Dashboard Redesign">
                             </div>
                             <div>
-                                <label class="block text-soft-ice mb-2">Industry *</label>
+                                <label for="projectIndustry" class="block text-soft-ice mb-2">Industry *</label>
                                 <select id="projectIndustry" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal">
                                     <option value="">Select Industry</option>
                                     <option value="luxury-retail">Luxury Retail</option>
@@ -662,7 +687,7 @@
                         </div>
                         
                         <div>
-                            <label class="block text-soft-ice mb-2">Project Budget *</label>
+                            <label for="projectBudget" class="block text-soft-ice mb-2">Project Budget *</label>
                             <div class="relative">
                                 <span class="absolute left-4 top-3 text-soft-ice">$</span>
                                 <input type="number" id="projectBudget" required min="500" step="100" class="w-full pl-10 pr-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" placeholder="3500">
@@ -671,7 +696,7 @@
                         </div>
                         
                         <div>
-                            <label class="block text-soft-ice mb-2">Project Vision & Requirements *</label>
+                            <label for="projectVision" class="block text-soft-ice mb-2">Project Vision & Requirements *</label>
                             <textarea id="projectVision" rows="5" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" placeholder="Describe your project vision, goals, and specific requirements..."></textarea>
                             <p class="text-sm text-soft-ice mt-2">Describe your project in detail. The more specific, the better the match with our elite developers.</p>
                         </div>
@@ -933,8 +958,8 @@
                                         </div>
                                     </div>
                                     <div class="flex">
-                                        <input type="text" readonly value="sk-••••••••••••••••••••••••" class="flex-grow px-4 py-2 rounded-l-lg bg-surface-teal/30 border border-surface-teal/50 text-soft-ice">
-                                        <button onclick="copyToClipboard('openai-key')" class="px-4 py-2 rounded-r-lg bg-surface-teal/50 text-soft-ice hover:bg-surface-teal/60 transition-colors">
+                                        <input type="text" readonly value="sk-••••••••••••••••••••••••" class="flex-grow px-4 py-2 rounded-l-lg bg-surface-teal/30 border border-surface-teal/50 text-soft-ice" id="openai-key-input">
+                                        <button onclick="copyToClipboard('openai-key-input')" class="px-4 py-2 rounded-r-lg bg-surface-teal/50 text-soft-ice hover:bg-surface-teal/60 transition-colors">
                                             <i class="fas fa-copy"></i>
                                         </button>
                                     </div>
@@ -949,8 +974,8 @@
                                         </div>
                                     </div>
                                     <div class="flex">
-                                        <input type="text" readonly value="sk_live_••••••••••••••••••••" class="flex-grow px-4 py-2 rounded-l-lg bg-surface-teal/30 border border-surface-teal/50 text-soft-ice">
-                                        <button onclick="copyToClipboard('stripe-key')" class="px-4 py-2 rounded-r-lg bg-surface-teal/50 text-soft-ice hover:bg-surface-teal/60 transition-colors">
+                                        <input type="text" readonly value="sk_live_••••••••••••••••••••" class="flex-grow px-4 py-2 rounded-l-lg bg-surface-teal/30 border border-surface-teal/50 text-soft-ice" id="stripe-key-input">
+                                        <button onclick="copyToClipboard('stripe-key-input')" class="px-4 py-2 rounded-r-lg bg-surface-teal/50 text-soft-ice hover:bg-surface-teal/60 transition-colors">
                                             <i class="fas fa-copy"></i>
                                         </button>
                                     </div>
@@ -1096,7 +1121,7 @@
         <div class="glass-effect rounded-2xl p-8 w-full max-w-md mx-4">
             <div class="flex justify-between items-center mb-8">
                 <h3 id="authModalTitle" class="text-2xl font-bold"></h3>
-                <button onclick="closeAuthModal()" class="text-soft-ice hover:text-accent-teal">
+                <button onclick="closeAuthModal()" class="text-soft-ice hover:text-accent-teal" aria-label="Close modal">
                     <i class="fas fa-times text-2xl"></i>
                 </button>
             </div>
@@ -1104,12 +1129,12 @@
             <div id="loginForm" class="hidden">
                 <div class="space-y-6">
                     <div>
-                        <label class="block text-soft-ice mb-2">Email Address</label>
+                        <label for="loginEmail" class="block text-soft-ice mb-2">Email Address</label>
                         <input type="email" id="loginEmail" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" placeholder="you@example.com">
                     </div>
                     
                     <div>
-                        <label class="block text-soft-ice mb-2">Password</label>
+                        <label for="loginPassword" class="block text-soft-ice mb-2">Password</label>
                         <input type="password" id="loginPassword" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" placeholder="••••••••">
                     </div>
                     
@@ -1118,7 +1143,7 @@
                             <input type="checkbox" id="remember" class="mr-2">
                             <label for="remember" class="text-soft-ice text-sm">Remember me</label>
                         </div>
-                        <a href="#" class="text-accent-teal text-sm hover:underline">Forgot password?</a>
+                        <button type="button" onclick="forgotPassword()" class="text-accent-teal text-sm hover:underline bg-transparent border-none p-0">Forgot password?</button>
                     </div>
                     
                     <button onclick="simulateLogin()" class="w-full py-3 rounded-lg bg-accent-teal text-primary-dark font-semibold hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300">
@@ -1145,7 +1170,7 @@
                     
                     <p class="text-center text-soft-ice mt-6">
                         Don't have an account? 
-                        <button onclick="showAuthModal('signup')" class="text-accent-teal hover:underline ml-1">Sign up</button>
+                        <button onclick="showAuthModal('signup')" class="text-accent-teal hover:underline ml-1 bg-transparent border-none p-0">Sign up</button>
                     </p>
                 </div>
             </div>
@@ -1154,22 +1179,22 @@
                 <div class="space-y-6">
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-soft-ice mb-2">First Name</label>
+                            <label for="signupFirstName" class="block text-soft-ice mb-2">First Name</label>
                             <input type="text" id="signupFirstName" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" placeholder="John">
                         </div>
                         <div>
-                            <label class="block text-soft-ice mb-2">Last Name</label>
+                            <label for="signupLastName" class="block text-soft-ice mb-2">Last Name</label>
                             <input type="text" id="signupLastName" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" placeholder="Doe">
                         </div>
                     </div>
                     
                     <div>
-                        <label class="block text-soft-ice mb-2">Email Address</label>
+                        <label for="signupEmail" class="block text-soft-ice mb-2">Email Address</label>
                         <input type="email" id="signupEmail" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" placeholder="you@example.com">
                     </div>
                     
                     <div>
-                        <label class="block text-soft-ice mb-2">Password</label>
+                        <label for="signupPassword" class="block text-soft-ice mb-2">Password</label>
                         <input type="password" id="signupPassword" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" placeholder="••••••••">
                     </div>
                     
@@ -1192,7 +1217,7 @@
                     
                     <p class="text-center text-soft-ice mt-6">
                         Already have an account? 
-                        <button onclick="showAuthModal('login')" class="text-accent-teal hover:underline ml-1">Sign in</button>
+                        <button onclick="showAuthModal('login')" class="text-accent-teal hover:underline ml-1 bg-transparent border-none p-0">Sign in</button>
                     </p>
                 </div>
             </div>
@@ -1204,7 +1229,7 @@
         <div class="glass-effect rounded-2xl p-8 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-8">
                 <h3 id="profileModalTitle" class="text-2xl font-bold"></h3>
-                <button onclick="closeProfileModal()" class="text-soft-ice hover:text-accent-teal">
+                <button onclick="closeProfileModal()" class="text-soft-ice hover:text-accent-teal" aria-label="Close modal">
                     <i class="fas fa-times text-2xl"></i>
                 </button>
             </div>
@@ -1213,11 +1238,11 @@
                 <form id="hostProfileUpdateForm" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-soft-ice mb-2">Company Name *</label>
+                            <label for="editCompanyName" class="block text-soft-ice mb-2">Company Name *</label>
                             <input type="text" id="editCompanyName" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" value="TechNova Solutions">
                         </div>
                         <div>
-                            <label class="block text-soft-ice mb-2">Industry *</label>
+                            <label for="editIndustry" class="block text-soft-ice mb-2">Industry *</label>
                             <select id="editIndustry" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal">
                                 <option value="tech" selected>Technology</option>
                                 <option value="luxury-retail">Luxury Retail</option>
@@ -1258,7 +1283,7 @@
                     </div>
                     
                     <div>
-                        <label class="block text-soft-ice mb-2">Business Description</label>
+                        <label for="editBusinessDesc" class="block text-soft-ice mb-2">Business Description</label>
                         <textarea id="editBusinessDesc" rows="4" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal">Leading technology solutions provider for enterprise clients.</textarea>
                     </div>
                     
@@ -1273,11 +1298,11 @@
                 <form id="developerProfileUpdateForm" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-soft-ice mb-2">Display Name *</label>
+                            <label for="editDevName" class="block text-soft-ice mb-2">Display Name *</label>
                             <input type="text" id="editDevName" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" value="Aarav Jain">
                         </div>
                         <div>
-                            <label class="block text-soft-ice mb-2">Primary Role *</label>
+                            <label for="editDevRole" class="block text-soft-ice mb-2">Primary Role *</label>
                             <select id="editDevRole" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal">
                                 <option value="full-stack" selected>Full Stack Developer</option>
                                 <option value="frontend">Frontend Developer</option>
@@ -1290,7 +1315,7 @@
                     </div>
                     
                     <div>
-                        <label class="block text-soft-ice mb-2">Portfolio Website</label>
+                        <label for="editPortfolio" class="block text-soft-ice mb-2">Portfolio Website</label>
                         <input type="url" id="editPortfolio" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" placeholder="https://yourportfolio.com" value="https://portfolio.aaravjain.dev">
                     </div>
                     
@@ -1311,7 +1336,7 @@
                     </div>
                     
                     <div>
-                        <label class="block text-soft-ice mb-2">Professional Bio</label>
+                        <label for="editDevBio" class="block text-soft-ice mb-2">Professional Bio</label>
                         <textarea id="editDevBio" rows="4" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal">Full-stack developer with expertise in modern web technologies. Passionate about building scalable applications and user-centric experiences.</textarea>
                     </div>
                     
@@ -1408,7 +1433,40 @@
                 // Use simulated auth state
                 checkSimulatedAuthState();
             }
+            
+            // Add form submission handlers
+            setupFormHandlers();
         });
+        
+        // Setup form handlers
+        function setupFormHandlers() {
+            // Project form
+            const projectForm = document.getElementById('projectForm');
+            if (projectForm) {
+                projectForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    handleProjectSubmission();
+                });
+            }
+            
+            // Host profile form
+            const hostProfileUpdateForm = document.getElementById('hostProfileUpdateForm');
+            if (hostProfileUpdateForm) {
+                hostProfileUpdateForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    handleHostProfileUpdate();
+                });
+            }
+            
+            // Developer profile form
+            const developerProfileUpdateForm = document.getElementById('developerProfileUpdateForm');
+            if (developerProfileUpdateForm) {
+                developerProfileUpdateForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    handleDeveloperProfileUpdate();
+                });
+            }
+        }
         
         // Simulated Firebase Authentication
         function setupFirebaseAuth() {
@@ -2040,6 +2098,10 @@
             simulateLogin();
         }
         
+        function forgotPassword() {
+            showNotification('Info', 'Password reset functionality would be implemented with Firebase in production.');
+        }
+        
         function logout() {
             currentUser = null;
             userType = null;
@@ -2064,9 +2126,7 @@
         }
         
         // Handle project form submission
-        document.getElementById('projectForm')?.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
+        function handleProjectSubmission() {
             const projectName = document.getElementById('projectName').value;
             const projectIndustry = document.getElementById('projectIndustry').value;
             const projectBudget = document.getElementById('projectBudget').value;
@@ -2088,7 +2148,7 @@
                 vision: projectVision,
                 timestamp: new Date().toISOString()
             });
-        });
+        }
         
         // Profile Modal Functions
         function editHostProfile() {
@@ -2124,9 +2184,7 @@
         }
         
         // Handle profile form submissions
-        document.getElementById('hostProfileUpdateForm')?.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
+        function handleHostProfileUpdate() {
             const companyName = document.getElementById('editCompanyName').value;
             const industry = document.getElementById('editIndustry').value;
             const subscription = document.querySelector('input[name="subscription"]:checked').value;
@@ -2139,11 +2197,9 @@
             
             closeProfileModal();
             showNotification('Success', 'Business profile updated successfully!');
-        });
+        }
         
-        document.getElementById('developerProfileUpdateForm')?.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
+        function handleDeveloperProfileUpdate() {
             const devName = document.getElementById('editDevName').value;
             const devRole = document.getElementById('editDevRole').value;
             const portfolio = document.getElementById('editPortfolio').value;
@@ -2157,7 +2213,7 @@
             
             closeProfileModal();
             showNotification('Success', 'Developer profile updated successfully!');
-        });
+        }
         
         // Utility Functions
         function formatIndustry(industry) {
@@ -2205,15 +2261,11 @@
             }, 3000);
         }
         
-        function copyToClipboard(type) {
-            let text = '';
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
             
-            if (type === 'openai-key') {
-                text = 'sk-••••••••••••••••••••••••';
-            } else if (type === 'stripe-key') {
-                text = 'sk_live_••••••••••••••••••••';
-            }
-            
+            const text = element.value;
             navigator.clipboard.writeText(text).then(() => {
                 showNotification('Copied!', 'API key copied to clipboard.');
             }).catch(err => {
@@ -2272,6 +2324,13 @@
         profileModal.addEventListener('click', function(event) {
             if (event.target === profileModal) {
                 closeProfileModal();
+            }
+        });
+        
+        // Prevent form submission on Enter key in certain inputs
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.type !== 'textarea' && e.target.tagName !== 'BUTTON') {
+                e.preventDefault();
             }
         });
     </script>
