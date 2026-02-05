@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms and Conditions | Codenprofit</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-dark: #17252A;
+            --surface-teal: #2B7A78;
+            --accent-teal: #3AAFA9;
+            --soft-ice: #DEF2F1;
+            --pure-white: #FEFFFF;
+        }
+        
+        * {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary-dark);
+            color: var(--pure-white);
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        /* Glassmorphism Effects */
+        .glass-effect {
+            background: rgba(43, 122, 120, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(58, 175, 169, 0.2);
+        }
+        
+        .glass-dark {
+            background: rgba(23, 37, 42, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(58, 175, 169, 0.2);
+        }
+        
+        .gradient-accent {
+            background: linear-gradient(90deg, rgba(58, 175, 169, 0.9) 0%, rgba(222, 242, 241, 0.7) 100%);
+        }
+
+        /* Scroll Spy Sidebar Styles */
+        .sidebar-link {
+            transition: all 0.3s ease;
+            border-left: 2px solid transparent;
+        }
+        
+        .sidebar-link.active {
+            color: var(--accent-teal);
+            border-left: 2px solid var(--accent-teal);
+            padding-left: 1.25rem;
+            background: rgba(58, 175, 169, 0.05);
+        }
+
+        /* Typography improvements for legal text */
+        .legal-content p {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.8;
+            color: var(--soft-ice);
+            margin-bottom: 1.5rem;
+        }
+
+        .legal-content h2 {
+            color: var(--accent-teal);
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .legal-content h3 {
+            color: var(--pure-white);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .legal-content ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .legal-content li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--soft-ice);
+        }
+
+        .legal-content li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent-teal);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--primary-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--surface-teal); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-teal); }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-content {
+            animation: slideUp 0.8s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-primary-dark text-pure-white">
+
+    <!-- Navigation Bar (Shared with Home) -->
+    <nav class="glass-dark fixed top-0 left-0 right-0 z-50 py-4 px-6 md:px-12">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="w-10 h-10 rounded-full gradient-accent flex items-center justify-center">
+                    <span class="font-orbitron font-bold text-primary-dark text-lg">C</span>
+                </div>
+                <a href="index.html#home" class="font-orbitron text-2xl font-bold text-accent-teal tracking-wider">CODENPROFIT</a>
+            </div>
+            
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html#home" class="text-soft-ice hover:text-accent-teal transition-colors">Home</a>
+                <a href="index.html#difference" class="text-soft-ice hover:text-accent-teal transition-colors">Difference</a>
+                <a href="index.html#services" class="text-soft-ice hover:text-accent-teal transition-colors">Services</a>
+                <a href="index.html#showcase" class="text-soft-ice hover:text-accent-teal transition-colors">Showcase</a>
+            </div>
+            
+            <div class="flex items-center">
+                <a href="index.html" class="px-5 py-2 rounded-lg border border-accent-teal text-accent-teal hover:bg-accent-teal/10 transition-all">
+                    Back to Platform
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <header class="pt-40 pb-20 px-6 md:px-12 bg-gradient-to-b from-surface-teal/20 to-primary-dark">
+        <div class="container mx-auto text-center animate-content">
+            <span class="inline-block px-4 py-1 rounded-full bg-accent-teal/20 text-accent-teal text-sm font-medium mb-4 uppercase tracking-widest">Legal Framework</span>
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">Terms and <span class="text-accent-teal">Conditions</span></h1>
+            <p class="text-soft-ice text-lg max-w-2xl mx-auto opacity-80">Last Updated: February 6, 2026</p>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <div class="container mx-auto px-6 md:px-12 pb-20">
+        <div class="flex flex-col lg:flex-row gap-12">
+            
+            <!-- Left Sidebar (Scroll Spy) -->
+            <aside class="lg:w-1/4 hidden lg:block">
+                <div class="sticky top-32 glass-dark rounded-2xl p-6 border border-surface-teal/30">
+                    <h4 class="font-orbitron text-sm font-bold text-accent-teal mb-6 tracking-widest uppercase">Navigation</h4>
+                    <nav class="flex flex-col space-y-2 text-sm">
+                        <a href="#introduction" class="sidebar-link px-4 py-2 hover:text-accent-teal active">1. Introduction</a>
+                        <a href="#definitions" class="sidebar-link px-4 py-2 hover:text-accent-teal">2. Definitions</a>
+                        <a href="#security" class="sidebar-link px-4 py-2 hover:text-accent-teal">3. Account Security</a>
+                        <a href="#badge-strike" class="sidebar-link px-4 py-2 hover:text-accent-teal">4. Badge & Strike System</a>
+                        <a href="#host-services" class="sidebar-link px-4 py-2 hover:text-accent-teal">5. Services for Hosts</a>
+                        <a href="#dev-services" class="sidebar-link px-4 py-2 hover:text-accent-teal">6. Services for Architects</a>
+                        <a href="#payments" class="sidebar-link px-4 py-2 hover:text-accent-teal">7. Payments & Escrow</a>
+                        <a href="#ip-rights" class="sidebar-link px-4 py-2 hover:text-accent-teal">8. Intellectual Property</a>
+                        <a href="#conduct" class="sidebar-link px-4 py-2 hover:text-accent-teal">9. Prohibited Conduct</a>
+                        <a href="#contact" class="sidebar-link px-4 py-2 hover:text-accent-teal">10. Support Bridge</a>
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- Legal Text Content -->
+            <main class="lg:w-3/4 legal-content animate-content" style="animation-delay: 0.2s;">
+                
+                <section id="introduction">
+                    <h2>1. Introduction</h2>
+                    <p>Welcome to Codenprofit ("we," "our," or "us"). By accessing or using our website, platform, and services (collectively, the "Platform"), you agree to be bound by these Terms and Conditions ("Terms"). Codenprofit is an elite marketplace designed to bridge the gap between student talent and real-world business impact.</p>
+                    <p>If you do not agree to these Terms, you may not access or use the Platform. Our goal is to maintain a high-trust environment where code becomes commercial capital without the interference of traditional agency markups.</p>
+                </section>
+
+                <section id="definitions">
+                    <h2>2. Definitions</h2>
+                    <p>To ensure clarity within our ecosystem, we define the following roles and terms:</p>
+                    <ul>
+                        <li><strong>"Host" (Client):</strong> Refers to business owners, entrepreneurs, or entities who post projects, manage brand assets, and fund development milestones.</li>
+                        <li><strong>"Developer" (Architect):</strong> Refers to the verified student developers, engineers, and designers admitted into our network who provide services to Hosts.</li>
+                        <li><strong>"Project":</strong> A specific scope of work (e.g., Luxury Web Design, E-Commerce Build) submitted by a Host.</li>
+                        <li><strong>"Commercial Capital":</strong> The earnings generated by Developers upon the successful completion of milestones.</li>
+                        <li><strong>"Badges":</strong> Visual credentials awarded to Developers based on skill and performance (e.g., "UI Master").</li>
+                    </ul>
+                </section>
+
+                <section id="security">
+                    <h2>3. Account Registration & Security</h2>
+                    <h3>3.1 Eligibility</h3>
+                    <p><strong>Hosts:</strong> Must be a legal business entity or an individual capable of forming a binding contract. You represent that you have the authority to represent your business.</p>
+                    <p><strong>Developers:</strong> Must be a verified student or recent graduate. Admission to the "Elite 150" network is subject to our rigorous vetting process, ensuring only the top 5% of applicants enter the marketplace.</p>
+                    <h3>3.2 Account Security</h3>
+                    <p>You are responsible for maintaining the confidentiality of your login credentials (via Google, GitHub, or Email/Password). You agree to notify us immediately of any unauthorized access. Codenprofit is not liable for losses due to compromised accounts.</p>
+                </section>
+
+                <section id="badge-strike" class="glass-dark rounded-2xl p-8 my-10 border border-accent-teal/20">
+                    <h2>4. The "Badge & Strike" System</h2>
+                    <p>Codenprofit operates on a merit-based system to ensure luxury-grade quality across all deliverables.</p>
+                    
+                    <h3>4.1 Badges</h3>
+                    <p>Developers earn Badges (e.g., "ML Expert," "UI Master") based on successful project delivery. These Badges determine eligibility for higher-budget projects. Badges cannot be bought; they must be earned through consistent technical excellence.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                        <div class="p-4 rounded-lg bg-surface-teal/20 border border-surface-teal/40">
+                            <h4 class="font-bold text-accent-teal mb-2">Strike 1 (Warning)</h4>
+                            <p class="text-xs mb-0">Late delivery without notice or minor quality issues in code or design.</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-orange-500/10 border border-orange-500/30">
+                            <h4 class="font-bold text-orange-400 mb-2">Strike 2 (Probation)</h4>
+                            <p class="text-xs mb-0">Unprofessional communication or missed major milestones. Account restricted to low-budget projects.</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-red-500/10 border border-red-500/30">
+                            <h4 class="font-bold text-red-500 mb-2">Strike 3 (Termination)</h4>
+                            <p class="text-xs mb-0">Abandonment of a project or severe violation of code standards. Results in permanent removal.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="host-services">
+                    <h2>5. Services for Hosts (Clients)</h2>
+                    <h3>5.1 Project Submission</h3>
+                    <p>Hosts must provide accurate details regarding their Vision, Industry, and Budget during the intake process. Misleading project descriptions may result in immediate cancellation without refund of the processing fee.</p>
+                    <h3>5.2 Milestones & Approval</h3>
+                    <p>Development is tracked via our proprietary <strong>Project Pulse</strong> system. Approval of a milestone constitutes absolute acceptance of the work and triggers the release of funds from escrow. Once a milestone is approved, it cannot be reversed.</p>
+                    <h3>5.3 Technical Guardianship</h3>
+                    <p>Hosts may opt for "Technical Guardianship," a subscription service for 24/7 maintenance. Cancellation of this service results in the termination of ongoing security updates and monitoring.</p>
+                </section>
+
+                <section id="dev-services">
+                    <h2>6. Services for Developers (Architects)</h2>
+                    <h3>6.1 Project Claims</h3>
+                    <p>Claiming a project via the Marketplace is a binding professional commitment. Developers must adhere to the timeline specified at the point of claiming. Failure to do so impacts your Strike Meter.</p>
+                    <h3>6.2 Earnings & Payouts</h3>
+                    <p>Funds are only released to your withdrawable balance after the Host approves the specific milestone via the Pulse tracker. Codenprofit takes <strong>0% Agency Markup</strong>, ensuring the developer receives 100% of the project value minus standard processing fees.</p>
+                </section>
+
+                <section id="payments">
+                    <h2>7. Payments & Refund Policy</h2>
+                    <p><strong>Escrow Protection:</strong> To protect both parties, funds are held in a secure escrow account managed by Codenprofit. This ensures the Host has the funds and the Developer gets paid upon success.</p>
+                    <p><strong>Refunds:</strong> Hosts are entitled to a refund for <em>uncompleted</em> milestones if the Developer fails to deliver. Funds for milestones that have been approved and delivered are non-refundable.</p>
+                </section>
+
+                <section id="ip-rights">
+                    <h2>8. Intellectual Property (IP) Rights</h2>
+                    <p><strong>Upon Payment:</strong> Once a Host pays for a project in full, 100% of the Intellectual Property rights (code, design, digital assets) transfer immediately to the Host.</p>
+                    <p><strong>Portfolio Rights:</strong> Developers retain the right to display the finished work in their Codenprofit Portfolio for demonstration purposes, unless a specific Non-Disclosure Agreement (NDA) is signed prior to the project start.</p>
+                </section>
+
+                <section id="conduct">
+                    <h2>9. Prohibited Conduct</h2>
+                    <p>Users agree NOT to attempt <strong>Circumvention</strong>: Taking payments or communications off the Codenprofit platform to avoid platform accountability is grounds for an immediate permanent ban. We also enforce a zero-tolerance policy for <strong>Plagiarism</strong>.</p>
+                </section>
+
+                <section id="contact" class="pt-10 border-t border-surface-teal/30">
+                    <h2>10. Contact Us & Support Bridge</h2>
+                    <div class="glass-effect rounded-2xl p-6 flex flex-col md:flex-row justify-between items-center">
+                        <div class="mb-4 md:mb-0">
+                            <p class="font-bold text-xl mb-1">Need Dispute Resolution?</p>
+                            <p class="text-soft-ice opacity-80 mb-0">Our Professional Support Bridge is active 24/7.</p>
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <a href="mailto:codenprofit.official@gmail.com" class="text-accent-teal font-medium hover:underline"><i class="fas fa-envelope mr-2"></i> codenprofit.official@gmail.com</a>
+                            <a href="tel:+917743806933" class="text-accent-teal font-medium hover:underline"><i class="fas fa-phone mr-2"></i> +91 7743806933</a>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Footer (Shared with Home) -->
+    <footer class="glass-dark mt-20 py-10 px-6 md:px-12">
+        <div class="container mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
+                <div>
+                    <div class="flex items-center space-x-2 mb-6">
+                        <div class="w-10 h-10 rounded-full gradient-accent flex items-center justify-center">
+                            <span class="font-orbitron font-bold text-primary-dark text-lg">C</span>
+                        </div>
+                        <span class="font-orbitron text-2xl font-bold text-accent-teal tracking-wider">CODENPROFIT</span>
+                    </div>
+                    <p class="text-soft-ice mb-6">Turning elite student talent into commercial capital through direct connections and zero agency fees.</p>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-6">Platform</h4>
+                    <ul class="space-y-3">
+                        <li><a href="index.html#home" class="text-soft-ice hover:text-accent-teal transition-colors">Home</a></li>
+                        <li><a href="index.html#difference" class="text-soft-ice hover:text-accent-teal transition-colors">Difference</a></li>
+                        <li><a href="index.html#services" class="text-soft-ice hover:text-accent-teal transition-colors">Services</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-6">Legal</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-accent-teal font-bold transition-colors underline">Terms & Conditions</a></li>
+                        <li><a href="#" class="text-soft-ice hover:text-accent-teal transition-colors">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-6">Mission</h4>
+                    <p class="text-soft-ice italic">"To kill the 'Entry Level' barrier and democratize professional tech by building digital legacies."</p>
+                </div>
+            </div>
+            
+            <div class="pt-8 border-t border-surface-teal/30 text-center text-soft-ice">
+                <p>&copy; 2026 CODENPROFIT. All rights reserved. Built for the future of commercial code.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Scroll Spy Logic
+        window.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.5
+            };
+
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    const id = entry.target.getAttribute('id');
+                    const sidebarLink = document.querySelector(`.sidebar-link[href="#${id}"]`);
+                    
+                    if (entry.isIntersecting) {
+                        document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
+                        if (sidebarLink) sidebarLink.classList.add('active');
+                    }
+                });
+            }, observerOptions);
+
+            // Track all sections that have an id and are in main
+            document.querySelectorAll('main section').forEach(section => {
+                observer.observe(section);
+            });
+        });
+
+        // Smooth Scroll offset adjustment
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                const navHeight = 100; // Adjust based on your header height
+                const elementPosition = target.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - navHeight;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: "smooth"
+                });
+            });
+        });
+    </script>
+</body>
+</html>
