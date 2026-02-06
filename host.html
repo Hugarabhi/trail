@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codenprofit | Host Dashboard</title>
+    
+    <!-- Tailwind CSS -->
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    
+    <style>
+        :root {
+            --primary-dark: #17252A;
+            --surface-teal: #2B7A78;
+            --accent-teal: #3AAFA9;
+            --soft-ice: #DEF2F1;
+            --pure-white: #FEFFFF;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary-dark);
+            color: var(--pure-white);
+            min-height: 100vh;
+        }
+        
+        .glass-effect {
+            background: rgba(43, 122, 120, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(58, 175, 169, 0.2);
+        }
+        
+        .glass-dark {
+            background: rgba(23, 37, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(58, 175, 169, 0.2);
+        }
+        
+        .gradient-accent {
+            background: linear-gradient(90deg, rgba(58, 175, 169, 0.9) 0%, rgba(222, 242, 241, 0.7) 100%);
+        }
+        
+        .text-accent-teal { color: var(--accent-teal); }
+        .text-soft-ice { color: var(--soft-ice); }
+        
+        .btn-primary {
+            background-color: var(--accent-teal);
+            color: var(--primary-dark);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2B7A78;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(58, 175, 169, 0.3);
+        }
+        
+        .btn-outline {
+            border: 2px solid var(--accent-teal);
+            color: var(--accent-teal);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline:hover {
+            background-color: rgba(58, 175, 169, 0.1);
+        }
+        
+        .form-input {
+            background: rgba(43, 122, 120, 0.3);
+            border: 1px solid rgba(43, 122, 120, 0.5);
+            color: var(--pure-white);
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-teal);
+            box-shadow: 0 0 0 3px rgba(58, 175, 169, 0.2);
+        }
+        
+        .status-pill {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-active {
+            background: rgba(58, 175, 169, 0.6);
+            color: var(--pure-white);
+        }
+        
+        .status-pending {
+            background: rgba(222, 242, 241, 0.3);
+            color: var(--soft-ice);
+        }
+        
+        .status-completed {
+            background: rgba(58, 175, 169, 0.3);
+            color: var(--accent-teal);
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(58, 175, 169, 0.2);
+            color: var(--accent-teal);
+            border: 1px solid rgba(58, 175, 169, 0.3);
+            margin: 2px;
+        }
+        
+        .sidebar {
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100vh;
+                z-index: 40;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Menu Button -->
+    <button id="mobile-menu-btn" class="md:hidden fixed top-4 left-4 z-50 w-10 h-10 rounded-lg glass-effect flex items-center justify-center">
+        <i class="fas fa-bars text-accent-teal"></i>
+    </button>
+    
+    <!-- Sidebar -->
+    <div class="sidebar glass-dark fixed left-0 top-0 h-screen overflow-y-auto">
+        <!-- Logo -->
+        <div class="p-6 border-b border-surface-teal/30">
+            <div class="flex items-center space-x-2">
+                <div class="w-10 h-10 rounded-full gradient-accent flex items-center justify-center">
+                    <span class="font-bold text-primary-dark text-lg">C</span>
+                </div>
+                <span class="text-xl font-bold text-accent-teal tracking-wider">CODENPROFIT</span>
+            </div>
+            <p class="text-xs text-soft-ice mt-2">Host Dashboard</p>
+        </div>
+        
+        <!-- User Info -->
+        <div class="p-6 border-b border-surface-teal/30">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 rounded-full gradient-accent flex items-center justify-center">
+                    <span class="font-bold text-primary-dark text-lg" id="user-initials">H</span>
+                </div>
+                <div>
+                    <p class="font-semibold" id="user-name">Host User</p>
+                    <p class="text-sm text-soft-ice" id="user-company">Company Name</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <nav class="p-4">
+            <ul class="space-y-2">
+                <li>
+                    <a href="#dashboard" class="flex items-center p-3 rounded-lg text-soft-ice hover:bg-surface-teal/30 hover:text-accent-teal transition-colors">
+                        <i class="fas fa-tachometer-alt mr-3"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="#projects" class="flex items-center p-3 rounded-lg text-soft-ice hover:bg-surface-teal/30 hover:text-accent-teal transition-colors">
+                        <i class="fas fa-project-diagram mr-3"></i>
+                        My Projects
+                    </a>
+                </li>
+                <li>
+                    <a href="#new-project" class="flex items-center p-3 rounded-lg text-soft-ice hover:bg-surface-teal/30 hover:text-accent-teal transition-colors">
+                        <i class="fas fa-plus-circle mr-3"></i>
+                        New Project
+                    </a>
+                </li>
+                <li>
+                    <a href="#developers" class="flex items-center p-3 rounded-lg text-soft-ice hover:bg-surface-teal/30 hover:text-accent-teal transition-colors">
+                        <i class="fas fa-code mr-3"></i>
+                        Developers
+                    </a>
+                </li>
+                <li>
+                    <a href="#profile" class="flex items-center p-3 rounded-lg text-soft-ice hover:bg-surface-teal/30 hover:text-accent-teal transition-colors">
+                        <i class="fas fa-user mr-3"></i>
+                        Profile
+                    </a>
+                </li>
+                <li>
+                    <a href="#billing" class="flex items-center p-3 rounded-lg text-soft-ice hover:bg-surface-teal/30 hover:text-accent-teal transition-colors">
+                        <i class="fas fa-credit-card mr-3"></i>
+                        Billing
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <!-- Bottom Links -->
+        <div class="absolute bottom-0 left-0 right-0 p-6 border-t border-surface-teal/30">
+            <ul class="space-y-2">
+                <li>
+                    <a href="index.html" class="flex items-center p-3 rounded-lg text-soft-ice hover:bg-surface-teal/30 hover:text-accent-teal transition-colors">
+                        <i class="fas fa-home mr-3"></i>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <button onclick="logout()" class="w-full flex items-center p-3 rounded-lg text-soft-ice hover:bg-surface-teal/30 hover:text-accent-teal transition-colors text-left">
+                        <i class="fas fa-sign-out-alt mr-3"></i>
+                        Logout
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="md:ml-64 p-4 md:p-6 min-h-screen">
+        <!-- Header -->
+        <header class="mb-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold">Host Command Center</h1>
+                    <p class="text-soft-ice">Manage your business projects and elite developer network</p>
+                </div>
+                <div class="mt-4 md:mt-0 flex items-center space-x-4">
+                    <a href="#new-project" class="px-4 py-2 rounded-lg btn-primary">
+                        <i class="fas fa-plus mr-2"></i> New Project
+                    </a>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Dashboard Content -->
+        <div id="dashboard-content">
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Stat 1 -->
+                <div class="glass-effect rounded-xl p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-soft-ice">Active Projects</p>
+                            <p class="text-3xl font-bold text-accent-teal" id="active-projects-count">5</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-accent-teal/20 flex items-center justify-center">
+                            <i class="fas fa-project-diagram text-accent-teal"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stat 2 -->
+                <div class="glass-effect rounded-xl p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-soft-ice">Total Investment</p>
+                            <p class="text-3xl font-bold text-accent-teal" id="total-investment">$24,500</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-accent-teal/20 flex items-center justify-center">
+                            <i class="fas fa-dollar-sign text-accent-teal"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stat 3 -->
+                <div class="glass-effect rounded-xl p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-soft-ice">Developers Hired</p>
+                            <p class="text-3xl font-bold text-accent-teal" id="developers-hired">8</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-accent-teal/20 flex items-center justify-center">
+                            <i class="fas fa-users text-accent-teal"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stat 4 -->
+                <div class="glass-effect rounded-xl p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-soft-ice">Avg. Project Time</p>
+                            <p class="text-3xl font-bold text-accent-teal" id="avg-project-time">3.2 weeks</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-accent-teal/20 flex items-center justify-center">
+                            <i class="fas fa-clock text-accent-teal"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Charts & Recent Projects -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Budget Chart -->
+                <div class="glass-effect rounded-xl p-6">
+                    <h3 class="text-xl font-bold mb-6">Budget Allocation</h3>
+                    <div class="chart-container" style="height: 300px;">
+                        <canvas id="budgetChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Recent Projects -->
+                <div class="glass-effect rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold">Recent Projects</h3>
+                        <a href="#projects" class="text-sm text-accent-teal hover:underline">View All</a>
+                    </div>
+                    <div class="space-y-4" id="recent-projects-list">
+                        <!-- Projects will be loaded here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- New Project Form -->
+            <div id="new-project-section" class="glass-effect rounded-xl p-6 mb-8 hidden">
+                <h3 class="text-2xl font-bold mb-6">Start a New Project</h3>
+                <form id="new-project-form" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="project-name" class="block text-soft-ice mb-2">Project Name *</label>
+                            <input type="text" id="project-name" required class="w-full px-4 py-3 rounded-lg form-input" placeholder="E-commerce Website">
+                        </div>
+                        <div>
+                            <label for="project-industry" class="block text-soft-ice mb-2">Industry *</label>
+                            <select id="project-industry" required class="w-full px-4 py-3 rounded-lg form-input">
+                                <option value="">Select Industry</option>
+                                <option value="ecommerce">E-commerce</option>
+                                <option value="technology">Technology</option>
+                                <option value="finance">Finance</option>
+                                <option value="healthcare">Healthcare</option>
+                                <option value="education">Education</option>
+                                <option value="travel">Travel & Hospitality</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="project-budget" class="block text-soft-ice mb-2">Budget Range *</label>
+                        <select id="project-budget" required class="w-full px-4 py-3 rounded-lg form-input">
+                            <option value="">Select Budget</option>
+                            <option value="1000-3000">$1,000 - $3,000</option>
+                            <option value="3000-5000">$3,000 - $5,000</option>
+                            <option value="5000-10000">$5,000 - $10,000</option>
+                            <option value="10000+">$10,000+</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="project-description" class="block text-soft-ice mb-2">Project Description *</label>
+                        <textarea id="project-description" rows="4" required class="w-full px-4 py-3 rounded-lg form-input" placeholder="Describe your project goals, requirements, and timeline..."></textarea>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" onclick="hideNewProjectForm()" class="px-6 py-3 rounded-lg btn-outline">Cancel</button>
+                        <button type="submit" class="px-6 py-3 rounded-lg btn-primary">Submit Project</button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Available Developers -->
+            <div class="glass-effect rounded-xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold">Available Developers</h3>
+                    <button onclick="loadDevelopers()" class="text-sm text-accent-teal hover:underline flex items-center">
+                        <i class="fas fa-sync-alt mr-2"></i> Refresh
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="developers-list">
+                    <!-- Developers will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div id="notification" class="fixed top-6 right-6 glass-effect rounded-lg p-4 shadow-lg z-50 transform translate-x-full transition-transform duration-300 max-w-sm">
+        <div class="flex items-center">
+            <div id="notification-icon" class="w-10 h-10 rounded-full flex items-center justify-center mr-4">
+                <i class="fas fa-check"></i>
+            </div>
+            <div>
+                <p class="font-medium" id="notification-title">Success!</p>
+                <p class="text-sm text-soft-ice" id="notification-message"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVWDmz4Cc9KLvBwf7iLsQiL_9HdjFw4Zk",
+            authDomain: "watchfree-d9e16.firebaseapp.com",
+            projectId: "watchfree-d9e16",
+            storageBucket: "watchfree-d9e16.firebasestorage.app",
+            messagingSenderId: "4487476314",
+            appId: "1:4487476314:web:6dfa4e14a8660705b15463",
+            measurementId: "G-0GY2JYKLHJ"
+        };
+        
+        // Initialize Firebase
+        let auth = null;
+        let db = null;
+        let currentUser = null;
+        let userData = null;
+        
+        try {
+            firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            db = firebase.firestore();
+            console.log("Firebase initialized successfully");
+        } catch (error) {
+            console.error("Firebase initialization failed:", error);
+        }
+        
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            checkAuth();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Initialize charts
+            initCharts();
+            
+            // Load initial data
+            loadInitialData();
+        });
+        
+        // Check Authentication
+        function checkAuth() {
+            if (auth) {
+                auth.onAuthStateChanged(async (user) => {
+                    if (user) {
+                        currentUser = user;
+                        await loadUserData(user.uid);
+                        updateUI();
+                    } else {
+                        // Not logged in, redirect to auth page
+                        window.location.href = 'auth.html?action=login';
+                    }
+                });
+            } else {
+                // Firebase not available, use demo mode
+                loadDemoData();
+            }
+        }
+        
+        // Load User Data
+        async function loadUserData(userId) {
+            try {
+                if (db) {
+                    const userDoc = await db.collection('users').doc(userId).get();
+                    if (userDoc.exists) {
+                        userData = userDoc.data();
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+        
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Mobile menu
+            document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+                document.querySelector('.sidebar').classList.toggle('active');
+            });
+            
+            // Navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#new-project') {
+                        e.preventDefault();
+                        showNewProjectForm();
+                    }
+                });
+            });
+            
+            // New project form
+            document.getElementById('new-project-form')?.addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitNewProject();
+            });
+            
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth < 768) {
+                    const sidebar = document.querySelector('.sidebar');
+                    const menuBtn = document.getElementById('mobile-menu-btn');
+                    if (!sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
+                        sidebar.classList.remove('active');
+                    }
+                }
+            });
+        }
+        
+        // Initialize Charts
+        function initCharts() {
+            // Budget Chart
+            const budgetCtx = document.getElementById('budgetChart')?.getContext('2d');
+            if (budgetCtx) {
+                new Chart(budgetCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Development', 'Design', 'Testing', 'Maintenance'],
+                        datasets: [{
+                            data: [45, 25, 20, 10],
+                            backgroundColor: ['#3AAFA9', '#2B7A78', '#17252A', '#DEF2F1'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#DEF2F1' }
+                            }
+                        },
+                        cutout: '60%'
+                    }
+                });
+            }
+        }
+        
+        // Load Initial Data
+        function loadInitialData() {
+            loadRecentProjects();
+            loadDevelopers();
+        }
+        
+        // Load Recent Projects
+        function loadRecentProjects() {
+            const projectsList = document.getElementById('recent-projects-list');
+            
+            // Sample projects data
+            const projects = [
+                {
+                    id: 1,
+                    name: 'E-commerce Platform',
+                    status: 'active',
+                    progress: 75,
+                    developer: 'Aarav Jain',
+                    timeline: '2 weeks left'
+                },
+                {
+                    id: 2,
+                    name: 'Booking System',
+                    status: 'pending',
+                    progress: 30,
+                    developer: 'Priya Kumar',
+                    timeline: '3 weeks left'
+                },
+                {
+                    id: 3,
+                    name: 'Admin Dashboard',
+                    status: 'completed',
+                    progress: 100,
+                    developer: 'Rohan Sharma',
+                    timeline: 'Completed'
+                }
+            ];
+            
+            if (projectsList) {
+                projectsList.innerHTML = projects.map(project => `
+                    <div class="glass-dark rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-semibold">${project.name}</h4>
+                            <span class="status-pill status-${project.status}">${project.status}</span>
+                        </div>
+                        <div class="mb-2">
+                            <div class="flex justify-between text-sm text-soft-ice mb-1">
+                                <span>Progress</span>
+                                <span>${project.progress}%</span>
+                            </div>
+                            <div class="w-full h-2 rounded-full bg-surface-teal/30">
+                                <div class="h-full rounded-full bg-accent-teal" style="width: ${project.progress}%"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between text-sm text-soft-ice">
+                            <span>Developer: ${project.developer}</span>
+                            <span>${project.timeline}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        // Load Developers
+        function loadDevelopers() {
+            const developersList = document.getElementById('developers-list');
+            
+            // Sample developers data
+            const developers = [
+                {
+                    id: 1,
+                    name: 'Aarav Jain',
+                    role: 'Full Stack Developer',
+                    rating: 4.9,
+                    skills: ['React', 'Node.js', 'MongoDB'],
+                    badges: ['UI Master', 'E-commerce Expert'],
+                    rate: '$75/hour'
+                },
+                {
+                    id: 2,
+                    name: 'Priya Kumar',
+                    role: 'AI/ML Specialist',
+                    rating: 4.8,
+                    skills: ['Python', 'TensorFlow', 'Data Science'],
+                    badges: ['AI Expert', 'Data Scientist'],
+                    rate: '$90/hour'
+                },
+                {
+                    id: 3,
+                    name: 'Rohan Sharma',
+                    role: 'DevOps Engineer',
+                    rating: 5.0,
+                    skills: ['AWS', 'Docker', 'Kubernetes'],
+                    badges: ['DevOps Master', 'Security Expert'],
+                    rate: '$85/hour'
+                }
+            ];
+            
+            if (developersList) {
+                developersList.innerHTML = developers.map(dev => `
+                    <div class="glass-dark rounded-xl p-5">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 rounded-full gradient-accent flex items-center justify-center mr-4">
+                                <span class="font-bold text-primary-dark">${dev.name.split(' ').map(n => n[0]).join('')}</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold">${dev.name}</h4>
+                                <div class="flex items-center">
+                                    <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
+                                    <span class="text-sm text-soft-ice">${dev.rating}/5.0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <p class="text-sm text-soft-ice mb-2">${dev.role}</p>
+                            <div class="flex flex-wrap gap-1 mb-3">
+                                ${dev.skills.map(skill => `<span class="text-xs px-2 py-1 rounded-full bg-surface-teal/40 text-soft-ice">${skill}</span>`).join('')}
+                            </div>
+                            <div class="flex flex-wrap gap-1">
+                                ${dev.badges.map(badge => `<span class="badge">${badge}</span>`).join('')}
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-accent-teal">${dev.rate}</span>
+                            <button onclick="hireDeveloper(${dev.id})" class="px-4 py-2 rounded-lg btn-primary text-sm">
+                                Hire Now
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        // Show New Project Form
+        function showNewProjectForm() {
+            document.getElementById('new-project-section').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function hideNewProjectForm() {
+            document.getElementById('new-project-section').classList.add('hidden');
+            document.getElementById('new-project-form').reset();
+        }
+        
+        // Submit New Project
+        async function submitNewProject() {
+            const name = document.getElementById('project-name').value;
+            const industry = document.getElementById('project-industry').value;
+            const budget = document.getElementById('project-budget').value;
+            const description = document.getElementById('project-description').value;
+            
+            if (!name || !industry || !budget || !description) {
+                showNotification('Error', 'Please fill all required fields');
+                return;
+            }
+            
+            try {
+                if (db && currentUser) {
+                    // Save to Firestore
+                    await db.collection('projects').add({
+                        name: name,
+                        industry: industry,
+                        budget: budget,
+                        description: description,
+                        hostId: currentUser.uid,
+                        status: 'pending',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        progress: 0
+                    });
+                    
+                    showNotification('Success', 'Project submitted successfully!');
+                    hideNewProjectForm();
+                    loadRecentProjects(); // Refresh list
+                } else {
+                    // Demo mode
+                    showNotification('Success', 'Project submitted successfully!');
+                    hideNewProjectForm();
+                    loadRecentProjects();
+                }
+            } catch (error) {
+                console.error('Error submitting project:', error);
+                showNotification('Error', 'Failed to submit project');
+            }
+        }
+        
+        // Hire Developer
+        function hireDeveloper(developerId) {
+            showNotification('Info', 'Our team will contact you shortly to connect with the developer.');
+        }
+        
+        // Update UI with User Data
+        function updateUI() {
+            if (userData) {
+                // Update user info
+                const initials = userData.displayName?.split(' ').map(n => n[0]).join('') || 'H';
+                document.getElementById('user-initials').textContent = initials;
+                document.getElementById('user-name').textContent = userData.displayName || 'Host User';
+                document.getElementById('user-company').textContent = userData.companyName || 'Company Name';
+            }
+        }
+        
+        // Load Demo Data
+        function loadDemoData() {
+            userData = {
+                displayName: 'Demo Host',
+                companyName: 'Demo Company',
+                userType: 'host'
+            };
+            updateUI();
+            loadInitialData();
+        }
+        
+        // Logout
+        function logout() {
+            if (auth) {
+                auth.signOut().then(() => {
+                    window.location.href = 'index.html';
+                }).catch(error => {
+                    console.error('Logout error:', error);
+                });
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+        
+        // Notification System
+        function showNotification(title, message, type = 'success') {
+            const icon = document.getElementById('notification-icon');
+            const notificationTitle = document.getElementById('notification-title');
+            const notificationMessage = document.getElementById('notification-message');
+            
+            // Set notification type
+            if (type === 'success') {
+                icon.className = 'w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center mr-4';
+                icon.innerHTML = '<i class="fas fa-check text-green-500"></i>';
+            } else if (type === 'error') {
+                icon.className = 'w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center mr-4';
+                icon.innerHTML = '<i class="fas fa-exclamation-circle text-red-500"></i>';
+            } else if (type === 'info') {
+                icon.className = 'w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center mr-4';
+                icon.innerHTML = '<i class="fas fa-info-circle text-blue-500"></i>';
+            }
+            
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            
+            // Show notification
+            notification.classList.remove('translate-x-full');
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
