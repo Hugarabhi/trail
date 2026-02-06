@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codenprofit | Developer Dashboard</title>
+    
+    <!-- Tailwind CSS -->
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    
+    <style>
+        :root {
+            --primary-dark: #17252A;
+            --surface-teal: #2B7A78;
+            --accent-teal: #3AAFA9;
+            --soft-ice: #DEF2F1;
+            --pure-white: #FEFFFF;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary-dark);
+            color: var(--pure-white);
+            min-height: 100vh;
+        }
+        
+        .glass-effect {
+            background: rgba(43, 122, 120, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(58, 175, 169, 0.2);
+        }
+        
+        .glass-dark {
+            background: rgba(23, 37, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(58, 175, 169, 0.2);
+        }
+        
+        .gradient-accent {
+            background: linear-gradient(90deg, rgba(58, 175, 169, 0.9) 0%, rgba(222, 242, 241, 0.7) 100%);
+        }
+        
+        .text-accent-teal { color: var(--accent-teal); }
+        .text-soft-ice { color: var(--soft-ice); }
+        
+        .btn-primary {
+            background-color: var(--accent-teal);
+            color: var(--primary-dark);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2B7A78;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(58, 175, 169, 0.3);
+        }
+        
+        .btn-outline {
+            border: 2px solid var(--accent-teal);
+            color: var(--accent-teal);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline:hover {
+            background-color: rgba(58, 175, 169, 0.1);
+        }
+        
+        .form-input {
+            background: rgba(43, 122, 120, 0.3);
+            border: 1px solid rgba(43, 122, 120, 0.5);
+            color: var(--pure-white);
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-teal);
+            box-shadow: 0 0 0 3px rgba(58, 175, 169, 0.2);
+        }
+        
+        .status-pill {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-available {
+            background: rgba(58, 175, 169, 0.6);
+            color: var(--pure-white);
+        }
+        
+        .status-inprogress {
+            background: rgba(222, 242, 241, 0.3);
+            color: var(--soft-ice);
+        }
+        
+        .status-completed {
+            background: rgba(58, 175, 169, 0.3);
+            color: var(--accent-teal);
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(58, 175, 169, 0.2);
+            color: var(--accent-teal);
+            border: 1px solid rgba(58, 175, 169, 0.3);
+            margin: 2px;
+        }
+        
+        .skill-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(58, 175, 169, 0.2);
+            color: var(--accent-teal);
+            border-radius: 15px;
+            font-size: 12px;
+            margin: 2px;
+        }
+        
+        .strike-meter {
+            width: 100%;
+            height: 6px;
+            background: rgba(222, 242, 241, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .strike-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        .strike-safe { background: var(--accent-teal); }
+        .strike-warning { background: #f59e0b; }
+        .strike-danger { background: #ef4444; }
+        
+        .sidebar {
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100vh;
+                z-index: 40;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Menu Button -->
+    <button id="mobile-menu-btn" class="md:hidden fixed top-4 left-4 z-50 w-10 h-10 rounded-lg glass-effect flex items-center justify-center">
+        <i class="fas fa-bars text-accent-teal"></i>
+    </button>
+    
+    <!-- Sidebar -->
+    <div class="sidebar glass-dark fixed left-0 top-0 h-screen overflow-y-auto">
+        <!-- Logo -->
+        <div class="p-6 border-b border-surface-teal/30">
+            <div class="flex items-center space-x-2">
+                <div class="w-10 h-10 rounded-full gradient-accent flex items-center justify-center">
+                    <span class="font-bold text-primary-dark text-lg">C</span>
+                </div>
+                <span class="text-xl font-bold text-accent-teal tracking-wider">CODENPROFIT</span>
+            </div>
+            <p class="text-xs text-soft-ice mt-2">Developer Dashboard</p>
+        </div>
+        
+        <!-- User Info -->
+        <div class="p-6 border-b border-surface-teal/30">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 rounded-full gradient-accent flex items-center justify-center">
+                    <span class="font-bold text-primary-dark text-lg" id="user-initials">D</span>
+                </div>
+                <div>
+                    <p class="font-semibold" id="user-name">Developer</p>
+                    <p class="text-sm text-soft-ice" id="user-role">Full Stack Developer</p>
+                    <div class="flex items-center mt-1">
+                        <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
+                        <span class="text-xs text-soft-ice" id="user-rating">5.0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Strike Meter -->
+            <div class="mt-4">
+                <div class="flex justify-between text-xs text-soft-ice mb-1">
+                    <span>Professional Score</span>
+                    <span id="strike-percentage">100%</span>
+                </div>
+                <div class="strike-meter">
+                    <div id="strike-fill" class="strike-fill strike-safe" style="width: 100%"></div>
+                </div>
+                <p class="text-xs text-soft-ice mt-1" id="strike-status">Clean record - 0 strikes</p>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <nav class="p-4">
+            <ul class="space-y-2">
+                <li>
+                    <a href="#dashboard" class="flex items-center p-3 rounded-lg text-soft-ice hover:bg-surface-teal/30 hover:text-accent-teal transition-colors">
+                        <i class="fas fa-tachometer-alt mr-3"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="#marketplace" class="flex items-center p-3 rounded-lg text-soft-ice hover:bg-surface-teal/30 hover:text-accent-teal transition-colors">
+                        <i class="fas fa-store mr-3"></i>
+                        Marketplace
+                    </a>
+                </li>
+                <li>
+                    <a href="#my-projects" class="flex items-center p-3 rounded-lg text-soft-ice hover:bg-surface-teal/30 hover:text-accent-teal transition-colors">
+                        <i class="fas fa-project-diagram mr-3"></i>
+                        My Projects
+                    </a>
+                </li>
+                <li>
+                    <a href="#earnings" class="flex items-center p-3 rounded-lg text-soft-ice hover:bg-surface-teal/30 hover:text-accent-teal transition-colors">
+                        <i class="fas fa-chart-line mr-3"></i>
+                        Earnings
+                    </a>
+                </li>
+                <li>
+                    <a href="#profile" class="flex items-center p-3 rounded-lg text-soft-ice hover:bg-surface-teal/30 hover:text-accent-teal transition-colors">
+                        <i class="fas fa-user mr-3"></i>
+                        Profile
+                    </a>
+                </li>
+                <li>
+                    <a href="#support" class="flex items-center p-3 rounded-lg text-soft-ice hover:bg-surface-teal/30 hover:text-accent-teal transition-colors">
+                        <i class="fas fa-headset mr-3"></i>
+                        Support
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <!-- Bottom Links -->
+        <div class="absolute bottom-0 left-0 right-0 p-6 border-t border-surface-teal/30">
+            <ul class="space-y-2">
+                <li>
+                    <a href="index.html" class="flex items-center p-3 rounded-lg text-soft-ice hover:bg-surface-teal/30 hover:text-accent-teal transition-colors">
+                        <i class="fas fa-home mr-3"></i>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <button onclick="logout()" class="w-full flex items-center p-3 rounded-lg text-soft-ice hover:bg-surface-teal/30 hover:text-accent-teal transition-colors text-left">
+                        <i class="fas fa-sign-out-alt mr-3"></i>
+                        Logout
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="md:ml-64 p-4 md:p-6 min-h-screen">
+        <!-- Header -->
+        <header class="mb-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold">Developer Command Center</h1>
+                    <p class="text-soft-ice">Turn your skills into commercial capital</p>
+                </div>
+                <div class="mt-4 md:mt-0 flex items-center space-x-4">
+                    <button onclick="refreshMarketplace()" class="px-4 py-2 rounded-lg btn-outline">
+                        <i class="fas fa-sync-alt mr-2"></i> Refresh
+                    </button>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Dashboard Content -->
+        <div id="dashboard-content">
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Stat 1 -->
+                <div class="glass-effect rounded-xl p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-soft-ice">Total Earnings</p>
+                            <p class="text-3xl font-bold text-accent-teal" id="total-earnings">$24,850</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-accent-teal/20 flex items-center justify-center">
+                            <i class="fas fa-dollar-sign text-accent-teal"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stat 2 -->
+                <div class="glass-effect rounded-xl p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-soft-ice">Pending Payments</p>
+                            <p class="text-3xl font-bold text-accent-teal" id="pending-payments">$3,200</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-accent-teal/20 flex items-center justify-center">
+                            <i class="fas fa-clock text-accent-teal"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stat 3 -->
+                <div class="glass-effect rounded-xl p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-soft-ice">Active Projects</p>
+                            <p class="text-3xl font-bold text-accent-teal" id="active-projects">3</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-accent-teal/20 flex items-center justify-center">
+                            <i class="fas fa-project-diagram text-accent-teal"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stat 4 -->
+                <div class="glass-effect rounded-xl p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-soft-ice">Avg. Rating</p>
+                            <p class="text-3xl font-bold text-accent-teal" id="avg-rating">4.9/5.0</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-accent-teal/20 flex items-center justify-center">
+                            <i class="fas fa-star text-accent-teal"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Charts & Marketplace -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Earnings Chart -->
+                <div class="glass-effect rounded-xl p-6">
+                    <h3 class="text-xl font-bold mb-6">Earnings Trend</h3>
+                    <div class="chart-container" style="height: 300px;">
+                        <canvas id="earningsChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Available Projects -->
+                <div class="glass-effect rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold">Available Projects</h3>
+                        <a href="#marketplace" class="text-sm text-accent-teal hover:underline">View All</a>
+                    </div>
+                    <div class="space-y-4" id="available-projects-list">
+                        <!-- Projects will be loaded here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- My Projects -->
+            <div class="glass-effect rounded-xl p-6 mb-8">
+                <h3 class="text-xl font-bold mb-6">My Active Projects</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-surface-teal/50">
+                                <th class="text-left py-3 px-4 text-soft-ice font-medium">Project</th>
+                                <th class="text-left py-3 px-4 text-soft-ice font-medium">Client</th>
+                                <th class="text-left py-3 px-4 text-soft-ice font-medium">Progress</th>
+                                <th class="text-left py-3 px-4 text-soft-ice font-medium">Deadline</th>
+                                <th class="text-left py-3 px-4 text-soft-ice font-medium">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="my-projects-list">
+                            <!-- Projects will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Badges & Skills -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Skills -->
+                <div class="glass-effect rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold">My Skills</h3>
+                        <button onclick="editSkills()" class="text-sm text-accent-teal hover:underline">
+                            <i class="fas fa-edit mr-2"></i> Edit
+                        </button>
+                    </div>
+                    <div class="flex flex-wrap gap-2" id="skills-list">
+                        <!-- Skills will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Badges -->
+                <div class="glass-effect rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold">Earned Badges</h3>
+                        <span class="text-sm text-soft-ice" id="badges-count">3 badges</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2" id="badges-list">
+                        <!-- Badges will be loaded here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Profile Edit Modal -->
+            <div id="profile-edit-modal" class="glass-effect rounded-xl p-6 mb-8 hidden">
+                <h3 class="text-2xl font-bold mb-6">Edit Profile</h3>
+                <form id="profile-edit-form" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="edit-name" class="block text-soft-ice mb-2">Display Name</label>
+                            <input type="text" id="edit-name" class="w-full px-4 py-3 rounded-lg form-input" value="Developer Name">
+                        </div>
+                        <div>
+                            <label for="edit-role" class="block text-soft-ice mb-2">Primary Role</label>
+                            <select id="edit-role" class="w-full px-4 py-3 rounded-lg form-input">
+                                <option value="full-stack">Full Stack Developer</option>
+                                <option value="frontend">Frontend Developer</option>
+                                <option value="backend">Backend Developer</option>
+                                <option value="ui-ux">UI/UX Designer</option>
+                                <option value="devops">DevOps Engineer</option>
+                                <option value="ai-ml">AI/ML Specialist</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="edit-portfolio" class="block text-soft-ice mb-2">Portfolio URL</label>
+                        <input type="url" id="edit-portfolio" class="w-full px-4 py-3 rounded-lg form-input" placeholder="https://yourportfolio.com">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-soft-ice mb-2">Skills</label>
+                        <div class="flex flex-wrap gap-2 mb-4" id="edit-skills-list">
+                            <!-- Skills will be loaded here -->
+                        </div>
+                        <div class="flex">
+                            <input type="text" id="new-skill-input" class="flex-grow px-4 py-3 rounded-l-lg form-input" placeholder="Add a skill">
+                            <button type="button" onclick="addNewSkill()" class="px-4 py-3 rounded-r-lg btn-primary">Add</button>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="edit-bio" class="block text-soft-ice mb-2">Bio</label>
+                        <textarea id="edit-bio" rows="4" class="w-full px-4 py-3 rounded-lg form-input" placeholder="Tell us about your experience and expertise..."></textarea>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" onclick="cancelEditProfile()" class="px-6 py-3 rounded-lg btn-outline">Cancel</button>
+                        <button type="submit" class="px-6 py-3 rounded-lg btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div id="notification" class="fixed top-6 right-6 glass-effect rounded-lg p-4 shadow-lg z-50 transform translate-x-full transition-transform duration-300 max-w-sm">
+        <div class="flex items-center">
+            <div id="notification-icon" class="w-10 h-10 rounded-full flex items-center justify-center mr-4">
+                <i class="fas fa-check"></i>
+            </div>
+            <div>
+                <p class="font-medium" id="notification-title">Success!</p>
+                <p class="text-sm text-soft-ice" id="notification-message"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVWDmz4Cc9KLvBwf7iLsQiL_9HdjFw4Zk",
+            authDomain: "watchfree-d9e16.firebaseapp.com",
+            projectId: "watchfree-d16",
+            storageBucket: "watchfree-d9e16.firebasestorage.app",
+            messagingSenderId: "4487476314",
+            appId: "1:4487476314:web:6dfa4e14a8660705b15463",
+            measurementId: "G-0GY2JYKLHJ"
+        };
+        
+        // Initialize Firebase
+        let auth = null;
+        let db = null;
+        let currentUser = null;
+        let userData = null;
+        
+        try {
+            firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            db = firebase.firestore();
+            console.log("Firebase initialized successfully");
+        } catch (error) {
+            console.error("Firebase initialization failed:", error);
+        }
+        
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            checkAuth();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Initialize charts
+            initCharts();
+            
+            // Load initial data
+            loadInitialData();
+        });
+        
+        // Check Authentication
+        function checkAuth() {
+            if (auth) {
+                auth.onAuthStateChanged(async (user) => {
+                    if (user) {
+                        currentUser = user;
+                        await loadUserData(user.uid);
+                        updateUI();
+                    } else {
+                        // Not logged in, redirect to auth page
+                        window.location.href = 'auth.html?action=login';
+                    }
+                });
+            } else {
+                // Firebase not available, use demo mode
+                loadDemoData();
+            }
+        }
+        
+        // Load User Data
+        async function loadUserData(userId) {
+            try {
+                if (db) {
+                    const userDoc = await db.collection('users').doc(userId).get();
+                    if (userDoc.exists) {
+                        userData = userDoc.data();
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+        
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Mobile menu
+            document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+                document.querySelector('.sidebar').classList.toggle('active');
+            });
+            
+            // Profile edit form
+            document.getElementById('profile-edit-form')?.addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveProfile();
+            });
+            
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth < 768) {
+                    const sidebar = document.querySelector('.sidebar');
+                    const menuBtn = document.getElementById('mobile-menu-btn');
+                    if (!sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
+                        sidebar.classList.remove('active');
+                    }
+                }
+            });
+        }
+        
+        // Initialize Charts
+        function initCharts() {
+            // Earnings Chart
+            const earningsCtx = document.getElementById('earningsChart')?.getContext('2d');
+            if (earningsCtx) {
+                new Chart(earningsCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                        datasets: [{
+                            label: 'Earnings ($)',
+                            data: [1200, 1800, 2200, 2800, 3200, 3800, 4500],
+                            borderColor: '#3AAFA9',
+                            backgroundColor: 'rgba(58, 175, 169, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#DEF2F1' }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { color: 'rgba(222, 242, 241, 0.1)' },
+                                ticks: { color: '#DEF2F1' }
+                            },
+                            y: {
+                                grid: { color: 'rgba(222, 242, 241, 0.1)' },
+                                ticks: {
+                                    color: '#DEF2F1',
+                                    callback: function(value) {
+                                        return '$' + value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Load Initial Data
+        function loadInitialData() {
+            loadAvailableProjects();
+            loadMyProjects();
+            loadSkills();
+            loadBadges();
+        }
+        
+        // Load Available Projects
+        function loadAvailableProjects() {
+            const projectsList = document.getElementById('available-projects-list');
+            
+            // Sample projects data
+            const projects = [
+                {
+                    id: 1,
+                    name: 'E-commerce Platform',
+                    client: 'Fashion Brand',
+                    budget: '$3,500',
+                    skills: ['React', 'Node.js', 'MongoDB'],
+                    timeline: '3 weeks'
+                },
+                {
+                    id: 2,
+                    name: 'Booking System',
+                    client: 'Hotel Chain',
+                    budget: '$4,200',
+                    skills: ['Python', 'Django', 'PostgreSQL'],
+                    timeline: '4 weeks'
+                },
+                {
+                    id: 3,
+                    name: 'Mobile App',
+                    client: 'Startup',
+                    budget: '$5,800',
+                    skills: ['React Native', 'Firebase', 'UI/UX'],
+                    timeline: '6 weeks'
+                }
+            ];
+            
+            if (projectsList) {
+                projectsList.innerHTML = projects.map(project => `
+                    <div class="glass-dark rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-semibold">${project.name}</h4>
+                            <span class="text-accent-teal font-bold">${project.budget}</span>
+                        </div>
+                        <div class="mb-3">
+                            <p class="text-sm text-soft-ice mb-2">Client: ${project.client}</p>
+                            <div class="flex flex-wrap gap-1">
+                                ${project.skills.map(skill => `<span class="text-xs px-2 py-1 rounded-full bg-surface-teal/40 text-soft-ice">${skill}</span>`).join('')}
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-soft-ice">Timeline: ${project.timeline}</span>
+                            <button onclick="claimProject(${project.id})" class="px-4 py-2 rounded-lg btn-primary text-sm">
+                                Claim Project
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        // Load My Projects
+        function loadMyProjects() {
+            const projectsList = document.getElementById('my-projects-list');
+            
+            // Sample projects data
+            const projects = [
+                {
+                    id: 1,
+                    name: 'Travel Portal',
+                    client: 'Gaanyogi Tours',
+                    progress: 85,
+                    deadline: 'Dec 30, 2023',
+                    status: 'active'
+                },
+                {
+                    id: 2,
+                    name: 'AI Analytics',
+                    client: 'BullNexAI',
+                    progress: 45,
+                    deadline: 'Jan 15, 2024',
+                    status: 'active'
+                },
+                {
+                    id: 3,
+                    name: 'Document Converter',
+                    client: 'convertdoc.ai',
+                    progress: 20,
+                    deadline: 'Feb 10, 2024',
+                    status: 'active'
+                }
+            ];
+            
+            if (projectsList) {
+                projectsList.innerHTML = projects.map(project => `
+                    <tr class="border-b border-surface-teal/20 hover:bg-surface-teal/10">
+                        <td class="py-4 px-4">
+                            <div class="font-medium">${project.name}</div>
+                        </td>
+                        <td class="py-4 px-4">${project.client}</td>
+                        <td class="py-4 px-4">
+                            <div class="flex items-center">
+                                <div class="w-24 h-2 rounded-full bg-surface-teal/30 mr-3">
+                                    <div class="h-full rounded-full bg-accent-teal" style="width: ${project.progress}%"></div>
+                                </div>
+                                <span class="text-sm">${project.progress}%</span>
+                            </div>
+                        </td>
+                        <td class="py-4 px-4">${project.deadline}</td>
+                        <td class="py-4 px-4">
+                            <button onclick="viewProject(${project.id})" class="px-3 py-1 rounded-lg btn-outline text-sm">
+                                View
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+        
+        // Load Skills
+        function loadSkills() {
+            const skillsList = document.getElementById('skills-list');
+            const editSkillsList = document.getElementById('edit-skills-list');
+            
+            // Sample skills
+            const skills = ['JavaScript', 'React', 'Node.js', 'Python', 'MongoDB', 'UI/UX', 'API Development', 'Git'];
+            
+            if (skillsList) {
+                skillsList.innerHTML = skills.map(skill => `
+                    <span class="skill-tag">${skill}</span>
+                `).join('');
+            }
+            
+            if (editSkillsList) {
+                editSkillsList.innerHTML = skills.map(skill => `
+                    <span class="skill-tag relative group">
+                        ${skill}
+                        <button onclick="removeSkill('${skill}')" class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-xs hidden group-hover:flex items-center justify-center">
+                            ×
+                        </button>
+                    </span>
+                `).join('');
+            }
+        }
+        
+        // Load Badges
+        function loadBadges() {
+            const badgesList = document.getElementById('badges-list');
+            const badgesCount = document.getElementById('badges-count');
+            
+            // Sample badges
+            const badges = [
+                { name: 'UI Master', color: 'bg-purple-500/20', text: 'text-purple-300' },
+                { name: 'Full Stack', color: 'bg-blue-500/20', text: 'text-blue-300' },
+                { name: 'E-commerce Expert', color: 'bg-green-500/20', text: 'text-green-300' },
+                { name: 'React Specialist', color: 'bg-cyan-500/20', text: 'text-cyan-300' },
+                { name: 'Node.js Pro', color: 'bg-green-500/20', text: 'text-green-300' },
+                { name: 'API Wizard', color: 'bg-yellow-500/20', text: 'text-yellow-300' }
+            ];
+            
+            if (badgesList) {
+                badgesList.innerHTML = badges.map(badge => `
+                    <span class="badge ${badge.color} ${badge.text} border-0">${badge.name}</span>
+                `).join('');
+            }
+            
+            if (badgesCount) {
+                badgesCount.textContent = `${badges.length} badges`;
+            }
+        }
+        
+        // Update UI with User Data
+        function updateUI() {
+            if (userData) {
+                // Update user info
+                const initials = userData.displayName?.split(' ').map(n => n[0]).join('') || 'D';
+                document.getElementById('user-initials').textContent = initials;
+                document.getElementById('user-name').textContent = userData.displayName || 'Developer';
+                document.getElementById('user-role').textContent = userData.role || 'Full Stack Developer';
+                document.getElementById('user-rating').textContent = userData.rating || '5.0';
+                
+                // Update stats
+                document.getElementById('total-earnings').textContent = '$' + (userData.earnings || 0).toLocaleString();
+                document.getElementById('pending-payments').textContent = '$' + (userData.pendingEarnings || 0).toLocaleString();
+                
+                // Update strike meter
+                updateStrikeMeter(userData.strikes || 0);
+            }
+        }
+        
+        // Update Strike Meter
+        function updateStrikeMeter(strikes) {
+            const strikeFill = document.getElementById('strike-fill');
+            const strikeStatus = document.getElementById('strike-status');
+            const strikePercentage = document.getElementById('strike-percentage');
+            
+            if (!strikeFill || !strikeStatus || !strikePercentage) return;
+            
+            let width = 100 - (strikes * 20);
+            if (width < 0) width = 0;
+            
+            let status = 'Clean record';
+            let className = 'strike-safe';
+            
+            if (strikes === 1) {
+                status = '1 strike - Warning';
+                className = 'strike-warning';
+            } else if (strikes === 2) {
+                status = '2 strikes - Critical';
+                className = 'strike-warning';
+            } else if (strikes >= 3) {
+                status = '3+ strikes - Danger';
+                className = 'strike-danger';
+            }
+            
+            strikeFill.style.width = width + '%';
+            strikeFill.className = 'strike-fill ' + className;
+            strikeStatus.textContent = status + ' - ' + strikes + ' strikes';
+            strikePercentage.textContent = width + '%';
+        }
+        
+        // Load Demo Data
+        function loadDemoData() {
+            userData = {
+                displayName: 'Demo Developer',
+                role: 'Full Stack Developer',
+                rating: 4.9,
+                earnings: 24850,
+                pendingEarnings: 3200,
+                strikes: 0,
+                userType: 'developer'
+            };
+            updateUI();
+            loadInitialData();
+        }
+        
+        // Claim Project
+        function claimProject(projectId) {
+            showNotification('Success', 'Project claimed successfully! Our team will contact you shortly.');
+            // In production, this would update Firestore
+        }
+        
+        // View Project
+        function viewProject(projectId) {
+            showNotification('Info', 'Opening project details...');
+            // In production, this would navigate to project page
+        }
+        
+        // Edit Skills
+        function editSkills() {
+            document.getElementById('profile-edit-modal').classList.remove('hidden');
+            window.scrollTo({ top: document.getElementById('profile-edit-modal').offsetTop - 100, behavior: 'smooth' });
+        }
+        
+        function cancelEditProfile() {
+            document.getElementById('profile-edit-modal').classList.add('hidden');
+        }
+        
+        // Add New Skill
+        function addNewSkill() {
+            const input = document.getElementById('new-skill-input');
+            const skill = input.value.trim();
+            
+            if (skill) {
+                const editSkillsList = document.getElementById('edit-skills-list');
+                const skillTag = document.createElement('span');
+                skillTag.className = 'skill-tag relative group';
+                skillTag.innerHTML = `
+                    ${skill}
+                    <button onclick="this.parentElement.remove()" class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-xs hidden group-hover:flex items-center justify-center">
+                        ×
+                    </button>
+                `;
+                editSkillsList.appendChild(skillTag);
+                input.value = '';
+            }
+        }
+        
+        // Remove Skill
+        function removeSkill(skill) {
+            // This is handled by the onclick event on the skill tag
+        }
+        
+        // Save Profile
+        async function saveProfile() {
+            const name = document.getElementById('edit-name').value;
+            const role = document.getElementById('edit-role').value;
+            const portfolio = document.getElementById('edit-portfolio').value;
+            const bio = document.getElementById('edit-bio').value;
+            
+            try {
+                if (db && currentUser) {
+                    // Get skills from edit list
+                    const skillTags = document.querySelectorAll('#edit-skills-list .skill-tag');
+                    const skills = Array.from(skillTags).map(tag => tag.textContent.trim().replace('×', ''));
+                    
+                    // Update Firestore
+                    await db.collection('users').doc(currentUser.uid).update({
+                        displayName: name,
+                        role: role,
+                        portfolio: portfolio,
+                        bio: bio,
+                        skills: skills,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    showNotification('Success', 'Profile updated successfully!');
+                    cancelEditProfile();
+                    updateUI();
+                } else {
+                    showNotification('Success', 'Profile updated successfully!');
+                    cancelEditProfile();
+                }
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                showNotification('Error', 'Failed to update profile');
+            }
+        }
+        
+        // Refresh Marketplace
+        function refreshMarketplace() {
+            loadAvailableProjects();
+            showNotification('Info', 'Marketplace refreshed');
+        }
+        
+        // Logout
+        function logout() {
+            if (auth) {
+                auth.signOut().then(() => {
+                    window.location.href = 'index.html';
+                }).catch(error => {
+                    console.error('Logout error:', error);
+                });
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+        
+        // Notification System
+        function showNotification(title, message, type = 'success') {
+            const icon = document.getElementById('notification-icon');
+            const notificationTitle = document.getElementById('notification-title');
+            const notificationMessage = document.getElementById('notification-message');
+            
+            // Set notification type
+            if (type === 'success') {
+                icon.className = 'w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center mr-4';
+                icon.innerHTML = '<i class="fas fa-check text-green-500"></i>';
+            } else if (type === 'error') {
+                icon.className = 'w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center mr-4';
+                icon.innerHTML = '<i class="fas fa-exclamation-circle text-red-500"></i>';
+            } else if (type === 'info') {
+                icon.className = 'w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center mr-4';
+                icon.innerHTML = '<i class="fas fa-info-circle text-blue-500"></i>';
+            }
+            
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            
+            // Show notification
+            notification.classList.remove('translate-x-full');
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
