@@ -4,20 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Codenprofit | Turn Code Into Commercial Capital</title>
+    
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Firebase SDK with compatibility mode -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    
     <style>
         :root {
             --primary-dark: #17252A;
@@ -61,13 +57,20 @@
             border: 1px solid rgba(58, 175, 169, 0.2);
         }
         
-        .gradient-bg {
-            background: linear-gradient(135deg, rgba(23, 37, 42, 0.9) 0%, rgba(43, 122, 120, 0.7) 100%);
-        }
-        
         .gradient-accent {
             background: linear-gradient(90deg, rgba(58, 175, 169, 0.9) 0%, rgba(222, 242, 241, 0.7) 100%);
         }
+        
+        /* Custom colors */
+        .bg-primary-dark { background-color: var(--primary-dark); }
+        .bg-surface-teal { background-color: var(--surface-teal); }
+        .bg-accent-teal { background-color: var(--accent-teal); }
+        .bg-soft-ice { background-color: var(--soft-ice); }
+        .text-pure-blue { color: var(--pure-white); }
+        .text-primary-dark { color: var(--primary-dark); }
+        .text-surface-teal { color: var(--surface-teal); }
+        .text-accent-teal { color: var(--accent-teal); }
+        .text-soft-ice { color: var(--soft-ice); }
         
         /* Animation Classes */
         @keyframes float {
@@ -75,17 +78,8 @@
             50% { transform: translateY(-10px); }
         }
         
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 15px rgba(58, 175, 169, 0.5); }
-            50% { box-shadow: 0 0 30px rgba(58, 175, 169, 0.8); }
-        }
-        
         .animate-float {
             animation: float 6s ease-in-out infinite;
-        }
-        
-        .animate-pulse-glow {
-            animation: pulse-glow 3s ease-in-out infinite;
         }
         
         /* Custom Scrollbar */
@@ -106,13 +100,6 @@
             background: var(--surface-teal);
         }
         
-        /* Chart.js Overrides */
-        .chart-container {
-            position: relative;
-            height: 100%;
-            width: 100%;
-        }
-        
         /* Status Indicators */
         .status-pill {
             display: inline-block;
@@ -121,7 +108,6 @@
             font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
         
         .status-design {
@@ -150,917 +136,291 @@
             background: rgba(58, 175, 169, 0.2);
             color: var(--accent-teal);
             border: 1px solid rgba(58, 175, 169, 0.3);
-            margin-right: 6px;
-            margin-bottom: 6px;
-        }
-        
-        .badge-premium {
-            background: linear-gradient(90deg, rgba(58, 175, 169, 0.3), rgba(222, 242, 241, 0.2));
-        }
-        
-        /* Utility Classes */
-        .page {
-            display: none;
-        }
-        
-        .page.active {
-            display: block;
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .skill-tag {
-            display: inline-block;
-            padding: 4px 10px;
-            background: rgba(58, 175, 169, 0.2);
-            color: var(--accent-teal);
-            border-radius: 15px;
-            font-size: 12px;
             margin: 2px;
         }
         
-        .strike-meter {
-            width: 100%;
-            height: 6px;
-            background: rgba(222, 242, 241, 0.2);
-            border-radius: 3px;
-            overflow: hidden;
+        .btn-primary {
+            background-color: var(--accent-teal);
+            color: var(--primary-dark);
+            transition: all 0.3s ease;
         }
         
-        .strike-fill {
-            height: 100%;
-            border-radius: 3px;
+        .btn-primary:hover {
+            background-color: #2B7A78;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(58, 175, 169, 0.3);
         }
         
-        .strike-safe {
-            background: var(--accent-teal);
+        .btn-outline {
+            border: 2px solid var(--accent-teal);
+            color: var(--accent-teal);
+            transition: all 0.3s ease;
         }
         
-        .strike-warning {
-            background: #f59e0b;
-        }
-        
-        .strike-danger {
-            background: #ef4444;
+        .btn-outline:hover {
+            background-color: rgba(58, 175, 169, 0.1);
         }
     </style>
 </head>
-<body class="bg-primary-dark text-pure-blue">
+<body class="bg-primary-dark">
     <!-- Navigation Bar -->
     <nav class="glass-dark fixed top-0 left-0 right-0 z-50 py-4 px-6 md:px-12">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-2">
-                <div class="w-10 h-10 rounded-full gradient-accent flex items-center justify-center cursor-pointer" onclick="showPage('landing')" role="button" aria-label="Go to Home">
+                <div class="w-10 h-10 rounded-full gradient-accent flex items-center justify-center">
                     <span class="font-orbitron font-bold text-primary-dark text-lg">C</span>
                 </div>
-                <span class="font-orbitron text-2xl font-bold text-accent-teal tracking-wider cursor-pointer" onclick="showPage('landing')" role="button" aria-label="Go to Home">CODENPROFIT</span>
+                <span class="font-orbitron text-2xl font-bold text-accent-teal tracking-wider">CODENPROFIT</span>
             </div>
             
-            <div class="hidden md:flex items-center space-x-8" id="nav-links">
-                <!-- Navigation links will be updated based on page -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#difference" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">The Difference</a>
+                <a href="#services" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Services</a>
+                <a href="#showcase" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Showcase</a>
+                <a href="#goal" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Our Goal</a>
+                <a href="#testimonials" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Testimonials</a>
             </div>
             
-            <div class="flex items-center space-x-4" id="nav-buttons">
-                <!-- Navigation buttons will be updated based on auth state -->
+            <div class="flex items-center space-x-4">
+                <a href="auth.html?action=login" class="px-5 py-2 rounded-lg btn-outline">Login</a>
+                <a href="auth.html?action=signup" class="px-5 py-2 rounded-lg btn-primary">Join Movement</a>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content Container -->
-    <main class="pt-24">
-        <!-- LANDING PAGE -->
-        <section id="landing-page" class="page active min-h-screen px-6 md:px-12 fade-in">
-            <div class="container mx-auto">
-                <!-- Hero Section -->
-                <div class="flex flex-col lg:flex-row items-center justify-between mb-20">
-                    <div class="lg:w-1/2 mb-12 lg:mb-0">
-                        <div class="mb-6">
-                            <span class="inline-block px-4 py-1 rounded-full bg-surface-teal/30 text-accent-teal text-sm font-medium mb-4">ELITE TALENT NETWORK</span>
-                            <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                                TURN YOUR <span class="text-accent-teal">CODE</span> INTO COMMERCIAL <span class="text-accent-teal">CAPITAL</span>
-                            </h1>
-                            <p class="text-soft-ice text-lg mb-10 max-w-2xl">
-                                The elite marketplace bridging the gap between student talent and real-world business impact.
-                            </p>
-                        </div>
-                        
-                        <div class="flex flex-wrap gap-4">
-                            <button onclick="showAuthModal('signup')" class="px-8 py-4 rounded-lg bg-accent-teal text-primary-dark font-semibold hover:shadow-xl hover:shadow-accent-teal/40 transform hover:scale-[1.03] transition-all duration-300 flex items-center">
-                                Join the Movement
-                                <i class="fas fa-arrow-right ml-3"></i>
-                            </button>
-                            <a href="#services" class="px-8 py-4 rounded-lg border border-accent-teal text-accent-teal font-semibold hover:bg-accent-teal/10 transition-all duration-300 flex items-center">
-                                Hire Our Network
-                                <i class="fas fa-briefcase ml-3"></i>
-                            </a>
-                        </div>
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-6 md:px-12">
+        <div class="container mx-auto">
+            <div class="flex flex-col lg:flex-row items-center justify-between">
+                <div class="lg:w-1/2 mb-12 lg:mb-0">
+                    <div class="mb-6">
+                        <span class="inline-block px-4 py-1 rounded-full bg-surface-teal/30 text-accent-teal text-sm font-medium mb-4">ELITE TALENT NETWORK</span>
+                        <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+                            TURN YOUR <span class="text-accent-teal">CODE</span> INTO COMMERCIAL <span class="text-accent-teal">CAPITAL</span>
+                        </h1>
+                        <p class="text-soft-ice text-lg mb-10 max-w-2xl">
+                            The elite marketplace bridging the gap between student talent and real-world business impact.
+                        </p>
                     </div>
                     
-                    <div class="lg:w-1/2 flex justify-center">
-                        <div class="relative">
-                            <div class="w-80 h-80 md:w-96 md:h-96 rounded-full gradient-accent animate-float flex items-center justify-center">
-                                <div class="w-64 h-64 md:w-80 md:h-80 rounded-full glass-effect flex flex-col items-center justify-center p-8">
-                                    <i class="fas fa-code text-6xl md:text-7xl text-accent-teal mb-6"></i>
-                                    <h3 class="font-orbitron text-2xl md:text-3xl text-center">Code → Capital</h3>
-                                    <p class="text-center text-soft-ice mt-2">Zero Agency Cut</p>
-                                </div>
-                            </div>
-                            <div class="absolute -top-4 -left-4 w-24 h-24 rounded-full bg-surface-teal/50 blur-xl"></div>
-                            <div class="absolute -bottom-4 -right-4 w-32 h-32 rounded-full bg-accent-teal/30 blur-xl"></div>
-                        </div>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="auth.html?action=signup" class="px-8 py-4 rounded-lg btn-primary flex items-center">
+                            Join the Movement
+                            <i class="fas fa-arrow-right ml-3"></i>
+                        </a>
+                        <a href="#services" class="px-8 py-4 rounded-lg btn-outline flex items-center">
+                            Hire Our Network
+                            <i class="fas fa-briefcase ml-3"></i>
+                        </a>
                     </div>
                 </div>
                 
-                <!-- Our Connection & Scale -->
-                <div class="glass-effect rounded-2xl p-8 mb-20">
-                    <h2 class="text-3xl font-bold mb-10 text-center">OUR NETWORK SCALE</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-                        <div class="text-center">
-                            <div class="mb-4">
-                                <canvas id="devChart" height="120"></canvas>
-                            </div>
-                            <h3 class="text-4xl font-bold text-accent-teal mb-2">150+</h3>
-                            <p class="text-soft-ice text-lg">Verified Developers</p>
-                            <p class="text-soft-ice mt-2">Elite student talent from top 5% of applicants</p>
-                        </div>
-                        
-                        <div class="text-center">
-                            <div class="mb-4">
-                                <canvas id="projectChart" height="120"></canvas>
-                            </div>
-                            <h3 class="text-4xl font-bold text-accent-teal mb-2">50+</h3>
-                            <p class="text-soft-ice text-lg">Active Projects</p>
-                            <p class="text-soft-ice mt-2">Real-world business solutions in development</p>
-                        </div>
-                    </div>
-                    <p class="text-center text-soft-ice mt-8 max-w-2xl mx-auto">
-                        A seamless bridge between student architects and local business owners, creating digital legacies while building high-impact careers.
-                    </p>
-                </div>
-                
-                <!-- The Difference Section -->
-                <div id="difference" class="mb-20">
-                    <h2 class="text-3xl font-bold mb-12 text-center">WHY WE ARE DIFFERENT?</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="glass-effect rounded-xl p-6 transition-all duration-500 hover:scale-[1.03] hover:border hover:border-accent-teal/40 hover:shadow-lg hover:shadow-accent-teal/20 group">
-                            <div class="w-14 h-14 rounded-full gradient-accent flex items-center justify-center mb-6 group-hover:animate-pulse-glow">
-                                <i class="fas fa-handshake text-2xl text-primary-dark"></i>
-                            </div>
-                            <h3 class="text-xl font-bold mb-3">No Agency Markup</h3>
-                            <p class="text-soft-ice">Direct access to developers without the expensive agency overhead. 100% value delivery.</p>
-                        </div>
-                        
-                        <div class="glass-effect rounded-xl p-6 transition-all duration-500 hover:scale-[1.03] hover:border hover:border-accent-teal/40 hover:shadow-lg hover:shadow-accent-teal/20 group">
-                            <div class="w-14 h-14 rounded-full gradient-accent flex items-center justify-center mb-6 group-hover:animate-pulse-glow">
-                                <i class="fas fa-filter text-2xl text-primary-dark"></i>
-                            </div>
-                            <h3 class="text-xl font-bold mb-3">Elite Vetting</h3>
-                            <p class="text-soft-ice">Only the top 5% of student talent are curated into our 150+ developer network.</p>
-                        </div>
-                        
-                        <div class="glass-effect rounded-xl p-6 transition-all duration-500 hover:scale-[1.03] hover:border hover:border-accent-teal/40 hover:shadow-lg hover:shadow-accent-teal/20 group">
-                            <div class="w-14 h-14 rounded-full gradient-accent flex items-center justify-center mb-6 group-hover:animate-pulse-glow">
-                                <i class="fas fa-shield-alt text-2xl text-primary-dark"></i>
-                            </div>
-                            <h3 class="text-xl font-bold mb-3">Badge & Strike System</h3>
-                            <p class="text-soft-ice">Professional accountability that ensures luxury-grade quality in every project.</p>
-                        </div>
-                        
-                        <div class="glass-effect rounded-xl p-6 transition-all duration-500 hover:scale-[1.03] hover:border hover:border-accent-teal/40 hover:shadow-lg hover:shadow-accent-teal/20 group">
-                            <div class="w-14 h-14 rounded-full gradient-accent flex items-center justify-center mb-6 group-hover:animate-pulse-glow">
-                                <i class="fas fa-bolt text-2xl text-primary-dark"></i>
-                            </div>
-                            <h3 class="text-xl font-bold mb-3">Rapid Prototyping</h3>
-                            <p class="text-soft-ice">Moving from idea to live product at startup speed with agile development cycles.</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Services Suite -->
-                <div id="services" class="mb-20">
-                    <h2 class="text-3xl font-bold mb-12 text-center">SERVICES SUITE</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="glass-dark rounded-xl p-6 border border-surface-teal/30 hover:border-accent-teal/50 transition-all duration-300 group">
-                            <div class="flex items-center justify-between mb-6">
-                                <div class="w-12 h-12 rounded-lg gradient-accent flex items-center justify-center">
-                                    <i class="fas fa-paint-brush text-xl text-primary-dark"></i>
-                                </div>
-                                <span class="text-xs font-semibold px-3 py-1 rounded-full bg-surface-teal/40 text-accent-teal">PREMIUM</span>
-                            </div>
-                            <h3 class="text-xl font-bold mb-3">Luxury Web Design</h3>
-                            <p class="text-soft-ice mb-6">High-end aesthetics and premium user experiences for luxury brands.</p>
-                            <div class="flex items-center text-accent-teal">
-                                <span class="text-sm font-medium">Explore Case Studies</span>
-                                <i class="fas fa-arrow-right ml-2 text-xs"></i>
+                <div class="lg:w-1/2 flex justify-center">
+                    <div class="relative">
+                        <div class="w-80 h-80 md:w-96 md:h-96 rounded-full gradient-accent animate-float flex items-center justify-center">
+                            <div class="w-64 h-64 md:w-80 md:h-80 rounded-full glass-effect flex flex-col items-center justify-center p-8">
+                                <i class="fas fa-code text-6xl md:text-7xl text-accent-teal mb-6"></i>
+                                <h3 class="font-orbitron text-2xl md:text-3xl text-center">Code → Capital</h3>
+                                <p class="text-center text-soft-ice mt-2">Zero Agency Cut</p>
                             </div>
                         </div>
-                        
-                        <div class="glass-dark rounded-xl p-6 border border-surface-teal/30 hover:border-accent-teal/50 transition-all duration-300 group">
-                            <div class="flex items-center justify-between mb-6">
-                                <div class="w-12 h-12 rounded-lg gradient-accent flex items-center justify-center">
-                                    <i class="fas fa-shopping-cart text-xl text-primary-dark"></i>
-                                </div>
-                                <span class="text-xs font-semibold px-3 py-1 rounded-full bg-surface-teal/40 text-accent-teal">WHATSAPP API</span>
-                            </div>
-                            <h3 class="text-xl font-bold mb-3">E-Commerce Excellence</h3>
-                            <p class="text-soft-ice mb-6">High-speed stores with integrated WhatsApp ordering and payment gateways.</p>
-                            <div class="flex items-center text-accent-teal">
-                                <span class="text-sm font-medium">View Demos</span>
-                                <i class="fas fa-arrow-right ml-2 text-xs"></i>
-                            </div>
-                        </div>
-                        
-                        <div class="glass-dark rounded-xl p-6 border border-surface-teal/30 hover:border-accent-teal/50 transition-all duration-300 group">
-                            <div class="flex items-center justify-between mb-6">
-                                <div class="w-12 h-12 rounded-lg gradient-accent flex items-center justify-center">
-                                    <i class="fas fa-robot text-xl text-primary-dark"></i>
-                                </div>
-                                <span class="text-xs font-semibold px-3 py-1 rounded-full bg-surface-teal/40 text-accent-teal">AUTOMATION</span>
-                            </div>
-                            <h3 class="text-xl font-bold mb-3">Business Automation</h3>
-                            <p class="text-soft-ice mb-6">Custom tools for workflow optimization, inventory management, and process automation.</p>
-                            <div class="flex items-center text-accent-teal">
-                                <span class="text-sm font-medium">See Integrations</span>
-                                <i class="fas fa-arrow-right ml-2 text-xs"></i>
-                            </div>
-                        </div>
-                        
-                        <div class="glass-dark rounded-xl p-6 border border-surface-teal/30 hover:border-accent-teal/50 transition-all duration-300 group">
-                            <div class="flex items-center justify-between mb-6">
-                                <div class="w-12 h-12 rounded-lg gradient-accent flex items-center justify-center">
-                                    <i class="fas fa-shield-alt text-xl text-primary-dark"></i>
-                                </div>
-                                <span class="text-xs font-semibold px-3 py-1 rounded-full bg-surface-teal/40 text-accent-teal">24/7</span>
-                            </div>
-                            <h3 class="text-xl font-bold mb-3">Technical Guardianship</h3>
-                            <p class="text-soft-ice mb-6">Round-the-clock maintenance, security monitoring, and performance optimization.</p>
-                            <div class="flex items-center text-accent-teal">
-                                <span class="text-sm font-medium">Security Report</span>
-                                <i class="fas fa-arrow-right ml-2 text-xs"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Working Projects Showcase -->
-                <div id="showcase" class="mb-20">
-                    <h2 class="text-3xl font-bold mb-12 text-center">LIVE PROJECT SHOWCASE</h2>
-                    <div class="mb-8 text-center">
-                        <p class="text-soft-ice max-w-3xl mx-auto">Featuring elite projects like Gaanyogi Tours & Travels, BullNexAI, and convertdoc.ai with real-time status tracking.</p>
-                    </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div class="glass-effect rounded-xl p-6 group hover:scale-[1.02] transition-all duration-500">
-                            <div class="flex justify-between items-start mb-6">
-                                <div>
-                                    <h3 class="text-2xl font-bold mb-2">Gaanyogi Tours & Travels</h3>
-                                    <span class="status-pill status-live">LIVE</span>
-                                </div>
-                                <div class="text-right">
-                                    <div class="text-soft-ice text-sm">Deployment Phase</div>
-                                    <div class="text-2xl font-bold text-accent-teal">100%</div>
-                                </div>
-                            </div>
-                            <p class="text-soft-ice mb-6">Complete travel portal with booking engine, payment integration, and admin dashboard for luxury travel experiences.</p>
-                            <div class="mb-6">
-                                <div class="flex justify-between text-sm text-soft-ice mb-2">
-                                    <span>Deployment Progress</span>
-                                    <span>100%</span>
-                                </div>
-                                <div class="w-full h-2 rounded-full bg-surface-teal/50">
-                                    <div class="h-full rounded-full bg-accent-teal w-full"></div>
-                                </div>
-                            </div>
-                            <div class="flex items-center text-accent-teal">
-                                <span class="text-sm font-medium">View Live Project</span>
-                                <i class="fas fa-external-link-alt ml-2 text-xs"></i>
-                            </div>
-                        </div>
-                        
-                        <div class="glass-effect rounded-xl p-6 group hover:scale-[1.02] transition-all duration-500">
-                            <div class="flex justify-between items-start mb-6">
-                                <div>
-                                    <h3 class="text-2xl font-bold mb-2">BullNexAI</h3>
-                                    <span class="status-pill status-deployment">DEPLOYMENT</span>
-                                </div>
-                                <div class="text-right">
-                                    <div class="text-soft-ice text-sm">Development Phase</div>
-                                    <div class="text-2xl font-bold text-accent-teal">75%</div>
-                                </div>
-                            </div>
-                            <p class="text-soft-ice mb-6">AI-powered financial analytics platform with predictive modeling and real-time stock market data visualization.</p>
-                            <div class="mb-6">
-                                <div class="flex justify-between text-sm text-soft-ice mb-2">
-                                    <span>Development Progress</span>
-                                    <span>75%</span>
-                                </div>
-                                <div class="w-full h-2 rounded-full bg-surface-teal/50">
-                                    <div class="h-full rounded-full bg-accent-teal w-3/4"></div>
-                                </div>
-                            </div>
-                            <div class="flex items-center text-accent-teal">
-                                <span class="text-sm font-medium">View Demo</span>
-                                <i class="fas fa-external-link-alt ml-2 text-xs"></i>
-                            </div>
-                        </div>
-                        
-                        <div class="glass-effect rounded-xl p-6 group hover:scale-[1.02] transition-all duration-500">
-                            <div class="flex justify-between items-start mb-6">
-                                <div>
-                                    <h3 class="text-2xl font-bold mb-2">convertdoc.ai</h3>
-                                    <span class="status-pill status-design">DESIGN</span>
-                                </div>
-                                <div class="text-right">
-                                    <div class="text-soft-ice text-sm">Design Phase</div>
-                                    <div class="text-2xl font-bold text-accent-teal">40%</div>
-                                </div>
-                            </div>
-                            <p class="text-soft-ice mb-6">Document conversion SaaS with AI-enhanced formatting, OCR technology, and multi-export capabilities.</p>
-                            <div class="mb-6">
-                                <div class="flex justify-between text-sm text-soft-ice mb-2">
-                                    <span>Design Progress</span>
-                                    <span>40%</span>
-                                </div>
-                                <div class="w-full h-2 rounded-full bg-surface-teal/50">
-                                    <div class="h-full rounded-full bg-accent-teal w-2/5"></div>
-                                </div>
-                            </div>
-                            <div class="flex items-center text-accent-teal">
-                                <span class="text-sm font-medium">View Prototype</span>
-                                <i class="fas fa-external-link-alt ml-2 text-xs"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Our Goal / Vision -->
-                <div id="goal" class="mb-20">
-                    <div class="glass-effect rounded-2xl p-10 text-center">
-                        <h2 class="text-3xl font-bold mb-6">OUR VISION & MISSION</h2>
-                        <div class="max-w-3xl mx-auto">
-                            <p class="text-xl text-soft-ice mb-6">
-                                <span class="text-accent-teal font-bold">To kill the "Entry Level" barrier</span> and democratize professional tech by building digital legacies for businesses while empowering students to build high-impact careers.
-                            </p>
-                            <p class="text-lg text-soft-ice">
-                                We believe talent should be measured by skill, not years of experience. Our platform creates a direct bridge between elite student developers and businesses that need premium digital solutions.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Testimonials -->
-                <div id="testimonials" class="mb-20">
-                    <h2 class="text-3xl font-bold mb-12 text-center">SOCIAL PROOF & FEEDBACK</h2>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div class="glass-effect rounded-2xl p-8">
-                            <h3 class="text-xl font-bold mb-6 text-accent-teal flex items-center">
-                                <i class="fas fa-building mr-3"></i> Business Owner Testimonials
-                            </h3>
-                            <div class="testimonial-slider">
-                                <div class="testimonial active">
-                                    <div class="flex items-center mb-6">
-                                        <div class="w-16 h-16 rounded-full gradient-accent flex items-center justify-center mr-4">
-                                            <span class="font-bold text-primary-dark text-xl">RK</span>
-                                        </div>
-                                        <div>
-                                            <h4 class="text-xl font-bold">Rahul Kumar</h4>
-                                            <p class="text-soft-ice">CEO, TechNova Solutions</p>
-                                        </div>
-                                    </div>
-                                    <p class="text-lg italic text-soft-ice">"Codenprofit delivered a complete e-commerce solution in 6 weeks that our previous agency estimated at 5 months. By bypassing agencies, we saved 60% on costs while getting premium results."</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="glass-effect rounded-2xl p-8">
-                            <h3 class="text-xl font-bold mb-6 text-accent-teal flex items-center">
-                                <i class="fas fa-code mr-3"></i> Developer Success Stories
-                            </h3>
-                            <div class="developer-testimonial-slider">
-                                <div class="developer-testimonial active">
-                                    <div class="flex items-center mb-6">
-                                        <div class="w-16 h-16 rounded-full gradient-accent flex items-center justify-center mr-4">
-                                            <span class="font-bold text-primary-dark text-xl">AJ</span>
-                                        </div>
-                                        <div>
-                                            <h4 class="text-xl font-bold">Aarav Jain</h4>
-                                            <p class="text-soft-ice">Full Stack Developer</p>
-                                            <div class="flex items-center mt-1">
-                                                <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
-                                                <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
-                                                <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
-                                                <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
-                                                <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
-                                                <span class="text-sm text-soft-ice ml-2">5.0 Rating</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <p class="text-lg italic text-soft-ice">"Transitioned from tutorials to professional-grade profit within 3 months. Built a luxury travel portal that now generates $15k/month for the client. Codenprofit gave me the real-world experience agencies demanded but never offered."</p>
-                                    <div class="mt-4 flex flex-wrap gap-2">
-                                        <span class="badge badge-premium">UI Master</span>
-                                        <span class="badge badge-premium">Full Stack</span>
-                                        <span class="badge badge-premium">E-commerce Expert</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="absolute -top-4 -left-4 w-24 h-24 rounded-full bg-surface-teal/50 blur-xl"></div>
+                        <div class="absolute -bottom-4 -right-4 w-32 h-32 rounded-full bg-accent-teal/30 blur-xl"></div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- HOST DASHBOARD -->
-        <section id="host-dashboard" class="page min-h-screen px-6 md:px-12">
-            <div class="container mx-auto">
-                <div class="flex justify-between items-center mb-10">
-                    <div>
-                        <h2 class="text-3xl font-bold">Host Command Center</h2>
-                        <p class="text-soft-ice">Manage your business profile, projects, and elite developer network</p>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <button onclick="showPage('landing')" class="px-5 py-2 rounded-lg border border-accent-teal text-accent-teal hover:bg-accent-teal/10 transition-all duration-300">
-                            <i class="fas fa-arrow-left mr-2"></i> Back to Home
-                        </button>
-                        <button onclick="showProjectSubmissionForm()" class="px-5 py-2 rounded-lg bg-accent-teal text-primary-dark font-medium hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300">
-                            <i class="fas fa-plus mr-2"></i> New Project
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Host Profile Section -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
-                    <div class="glass-effect rounded-xl p-6">
-                        <h3 class="text-xl font-bold mb-6 flex items-center">
-                            <i class="fas fa-building mr-3 text-accent-teal"></i> Business Profile
-                        </h3>
-                        <div class="space-y-4" id="host-profile-info">
-                            <div>
-                                <p class="text-soft-ice text-sm">Company Name</p>
-                                <p class="font-medium" id="host-company-name">TechNova Solutions</p>
-                            </div>
-                            <div>
-                                <p class="text-soft-ice text-sm">Industry</p>
-                                <p class="font-medium" id="host-industry">Technology</p>
-                            </div>
-                            <div>
-                                <p class="text-soft-ice text-sm">Subscription Plan</p>
-                                <p class="font-medium text-accent-teal" id="host-subscription">Pro ($299/month)</p>
-                            </div>
-                            <div class="pt-4">
-                                <button onclick="editHostProfile()" class="w-full px-4 py-2 rounded-lg border border-accent-teal text-accent-teal hover:bg-accent-teal/10 transition-all duration-300">
-                                    Edit Profile
-                                </button>
-                            </div>
-                        </div>
+    <!-- Network Scale -->
+    <section class="py-20 px-6 md:px-12">
+        <div class="container mx-auto">
+            <div class="glass-effect rounded-2xl p-8 mb-20">
+                <h2 class="text-3xl font-bold mb-10 text-center">OUR NETWORK SCALE</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <div class="text-center">
+                        <h3 class="text-4xl font-bold text-accent-teal mb-2">150+</h3>
+                        <p class="text-soft-ice text-lg">Verified Developers</p>
+                        <p class="text-soft-ice mt-2">Elite student talent from top 5% of applicants</p>
                     </div>
                     
-                    <div class="glass-effect rounded-xl p-6">
-                        <h3 class="text-xl font-bold mb-6 flex items-center">
-                            <i class="fas fa-palette mr-3 text-accent-teal"></i> Brand Assets
-                        </h3>
-                        <div class="space-y-4">
-                            <div class="flex items-center space-x-4">
-                                <div class="w-16 h-16 rounded-lg bg-surface-teal/30 flex items-center justify-center">
-                                    <i class="fas fa-image text-2xl text-soft-ice"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium">Logo Files</p>
-                                    <p class="text-sm text-soft-ice">Upload PNG, SVG formats</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center space-x-4">
-                                <div class="w-16 h-16 rounded-lg bg-surface-teal/30 flex items-center justify-center">
-                                    <i class="fas fa-swatchbook text-2xl text-soft-ice"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium">Brand Colors</p>
-                                    <p class="text-sm text-soft-ice">Primary & secondary palette</p>
-                                </div>
-                            </div>
-                            <button class="w-full mt-4 px-4 py-2 rounded-lg bg-surface-teal/30 text-soft-ice hover:bg-surface-teal/40 transition-colors">
-                                Upload Assets
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="glass-effect rounded-xl p-6">
-                        <h3 class="text-xl font-bold mb-6 flex items-center">
-                            <i class="fas fa-chart-pie mr-3 text-accent-teal"></i> Billing Analytics
-                        </h3>
-                        <div class="chart-container">
-                            <canvas id="hostBudgetChart"></canvas>
-                        </div>
-                        <div class="mt-4">
-                            <p class="text-soft-ice text-sm">Current Balance</p>
-                            <p class="text-2xl font-bold text-accent-teal">$3,850</p>
-                        </div>
+                    <div class="text-center">
+                        <h3 class="text-4xl font-bold text-accent-teal mb-2">50+</h3>
+                        <p class="text-soft-ice text-lg">Active Projects</p>
+                        <p class="text-soft-ice mt-2">Real-world business solutions in development</p>
                     </div>
                 </div>
-                
-                <!-- Project Submission Form -->
-                <div id="project-submission-form" class="glass-effect rounded-xl p-6 mb-10 hidden">
-                    <h3 class="text-2xl font-bold mb-6">New Project Submission</h3>
-                    <form id="projectForm" class="space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label for="projectName" class="block text-soft-ice mb-2">Project Name *</label>
-                                <input type="text" id="projectName" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" placeholder="E-commerce Dashboard Redesign">
-                            </div>
-                            <div>
-                                <label for="projectIndustry" class="block text-soft-ice mb-2">Industry *</label>
-                                <select id="projectIndustry" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal">
-                                    <option value="">Select Industry</option>
-                                    <option value="luxury-retail">Luxury Retail</option>
-                                    <option value="tech">Technology</option>
-                                    <option value="finance">Finance</option>
-                                    <option value="healthcare">Healthcare</option>
-                                    <option value="travel">Travel & Hospitality</option>
-                                    <option value="education">Education</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <label for="projectBudget" class="block text-soft-ice mb-2">Project Budget *</label>
-                            <div class="relative">
-                                <span class="absolute left-4 top-3 text-soft-ice">$</span>
-                                <input type="number" id="projectBudget" required min="500" step="100" class="w-full pl-10 pr-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" placeholder="3500">
-                            </div>
-                            <p class="text-sm text-soft-ice mt-2">Minimum project budget: $500</p>
-                        </div>
-                        
-                        <div>
-                            <label for="projectVision" class="block text-soft-ice mb-2">Project Vision & Requirements *</label>
-                            <textarea id="projectVision" rows="5" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" placeholder="Describe your project vision, goals, and specific requirements..."></textarea>
-                            <p class="text-sm text-soft-ice mt-2">Describe your project in detail. The more specific, the better the match with our elite developers.</p>
-                        </div>
-                        
-                        <div class="flex justify-end space-x-4">
-                            <button type="button" onclick="hideProjectSubmissionForm()" class="px-6 py-3 rounded-lg border border-accent-teal text-accent-teal hover:bg-accent-teal/10 transition-all duration-300">Cancel</button>
-                            <button type="submit" class="px-6 py-3 rounded-lg bg-accent-teal text-primary-dark font-semibold hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300">Submit Project</button>
-                        </div>
-                    </form>
-                </div>
-                
-                <!-- Milestone Approval -->
-                <div class="glass-effect rounded-xl p-6 mb-10">
-                    <h3 class="text-xl font-bold mb-6">Project Pulse — Milestone Approval</h3>
-                    <div class="mb-8">
-                        <div class="flex flex-col md:flex-row justify-between items-center mb-8">
-                            <div class="w-full md:w-3/4 mb-6 md:mb-0">
-                                <div class="flex justify-between mb-2">
-                                    <span class="text-soft-ice">UI/UX Design Phase</span>
-                                    <span class="text-accent-teal font-bold">Completed</span>
-                                </div>
-                                <div class="w-full h-3 rounded-full bg-surface-teal/50 mb-6">
-                                    <div class="h-full rounded-full bg-accent-teal w-full"></div>
-                                </div>
-                                
-                                <div class="flex justify-between mb-2">
-                                    <span class="text-soft-ice">Frontend Development</span>
-                                    <span class="text-accent-teal font-bold">75%</span>
-                                </div>
-                                <div class="w-full h-3 rounded-full bg-surface-teal/50 mb-6">
-                                    <div class="h-full rounded-full bg-accent-teal w-3/4"></div>
-                                </div>
-                                
-                                <div class="flex justify-between mb-2">
-                                    <span class="text-soft-ice">Backend Integration</span>
-                                    <span class="text-soft-ice">Pending Approval</span>
-                                </div>
-                                <div class="w-full h-3 rounded-full bg-surface-teal/50">
-                                    <div class="h-full rounded-full bg-accent-teal w-1/4"></div>
-                                </div>
-                            </div>
-                            
-                            <div class="flex space-x-4">
-                                <button class="px-6 py-3 rounded-lg bg-accent-teal text-primary-dark font-semibold hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300">Approve Phase</button>
-                                <button class="px-6 py-3 rounded-lg border border-accent-teal text-accent-teal font-semibold hover:bg-accent-teal/10 transition-all duration-300">Request Revision</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="border-t border-surface-teal/30 pt-6">
-                        <h4 class="font-bold mb-4">Communication Bridge</h4>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-4">
-                                <div class="flex items-center">
-                                    <div class="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-                                    <span class="text-sm text-soft-ice">24/7 Support Active</span>
-                                </div>
-                                <button class="px-4 py-2 rounded-lg bg-surface-teal/30 text-soft-ice hover:bg-surface-teal/40 transition-colors flex items-center">
-                                    <i class="fas fa-comments mr-2"></i> Message Developer
-                                </button>
-                                <button class="px-4 py-2 rounded-lg bg-surface-teal/30 text-soft-ice hover:bg-surface-teal/40 transition-colors flex items-center">
-                                    <i class="fas fa-headset mr-2"></i> Contact HR Lead
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Developer Selection -->
-                <div class="glass-effect rounded-xl p-6">
-                    <h3 class="text-xl font-bold mb-6">Elite Developer Selection</h3>
-                    <p class="text-soft-ice mb-6">Review the top 5% of student developer profiles, including earned badges and past project success rates.</p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="developer-grid">
-                        <!-- Developer profiles loaded via JavaScript -->
-                    </div>
-                </div>
+                <p class="text-center text-soft-ice mt-8 max-w-2xl mx-auto">
+                    A seamless bridge between student architects and local business owners, creating digital legacies while building high-impact careers.
+                </p>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- DEVELOPER DASHBOARD -->
-        <section id="developer-dashboard" class="page min-h-screen px-6 md:px-12">
-            <div class="container mx-auto">
-                <div class="flex justify-between items-center mb-10">
-                    <div>
-                        <h2 class="text-3xl font-bold">Developer Command Center</h2>
-                        <p class="text-soft-ice">Manage projects, showcase skills, and grow your commercial capital</p>
+    <!-- The Difference -->
+    <section id="difference" class="py-20 px-6 md:px-12 bg-surface-teal/10">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold mb-12 text-center">WHY WE ARE DIFFERENT?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Card 1 -->
+                <div class="glass-effect rounded-xl p-6 transition-all duration-500 hover:scale-[1.03] hover:shadow-lg">
+                    <div class="w-14 h-14 rounded-full gradient-accent flex items-center justify-center mb-6">
+                        <i class="fas fa-handshake text-2xl text-primary-dark"></i>
                     </div>
-                    <div class="flex items-center space-x-4">
-                        <button onclick="showPage('landing')" class="px-5 py-2 rounded-lg border border-accent-teal text-accent-teal hover:bg-accent-teal/10 transition-all duration-300">
-                            <i class="fas fa-arrow-left mr-2"></i> Back to Home
-                        </button>
-                        <button onclick="refreshMarketplace()" class="px-5 py-2 rounded-lg bg-accent-teal text-primary-dark font-medium hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300">
-                            <i class="fas fa-sync-alt mr-2"></i> Refresh Marketplace
-                        </button>
-                    </div>
+                    <h3 class="text-xl font-bold mb-3">No Agency Markup</h3>
+                    <p class="text-soft-ice">Direct access to developers without expensive agency overhead.</p>
                 </div>
                 
-                <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-10">
-                    <!-- Developer Profile -->
-                    <div class="glass-effect rounded-xl p-6 lg:col-span-1">
-                        <div class="flex flex-col items-center mb-6">
-                            <div id="dev-avatar" class="w-24 h-24 rounded-full gradient-accent flex items-center justify-center mb-4">
-                                <span class="font-bold text-primary-dark text-3xl">AJ</span>
-                            </div>
-                            <h3 id="dev-name" class="text-xl font-bold">Aarav Jain</h3>
-                            <p id="dev-role" class="text-soft-ice">Full Stack Developer</p>
-                            <div class="flex items-center mt-2">
-                                <i class="fas fa-star text-yellow-400 text-sm mr-1"></i>
-                                <i class="fas fa-star text-yellow-400 text-sm mr-1"></i>
-                                <i class="fas fa-star text-yellow-400 text-sm mr-1"></i>
-                                <i class="fas fa-star text-yellow-400 text-sm mr-1"></i>
-                                <i class="fas fa-star text-yellow-400 text-sm mr-1"></i>
-                                <span class="text-sm text-soft-ice ml-2" id="dev-rating">5.0</span>
-                            </div>
-                        </div>
-                        
-                        <div class="space-y-4 mb-6">
-                            <div>
-                                <p class="text-soft-ice text-sm">Portfolio Link</p>
-                                <a href="#" id="dev-portfolio" class="text-accent-teal hover:underline break-all">portfolio.aaravjain.dev</a>
-                            </div>
-                            <div>
-                                <p class="text-soft-ice text-sm">Strike Meter</p>
-                                <div class="strike-meter">
-                                    <div id="strike-fill" class="strike-fill strike-safe" style="width: 100%"></div>
-                                </div>
-                                <p id="strike-status" class="text-xs text-soft-ice mt-1">Clean record - 0 strikes</p>
-                            </div>
-                            <div>
-                                <p class="text-soft-ice text-sm mb-2">Earned Badges</p>
-                                <div id="badge-container" class="flex flex-wrap gap-2">
-                                    <span class="badge badge-premium">UI Master</span>
-                                    <span class="badge badge-premium">Full Stack</span>
-                                    <span class="badge badge-premium">React Expert</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <button onclick="editDeveloperProfile()" class="w-full px-4 py-3 rounded-lg bg-accent-teal text-primary-dark font-semibold hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300">
-                            Update Profile
-                        </button>
+                <!-- Card 2 -->
+                <div class="glass-effect rounded-xl p-6 transition-all duration-500 hover:scale-[1.03] hover:shadow-lg">
+                    <div class="w-14 h-14 rounded-full gradient-accent flex items-center justify-center mb-6">
+                        <i class="fas fa-filter text-2xl text-primary-dark"></i>
                     </div>
-                    
-                    <!-- Projects Marketplace -->
-                    <div class="glass-effect rounded-xl p-6 lg:col-span-3">
-                        <h3 class="text-xl font-bold mb-6">Projects Marketplace</h3>
-                        <p class="text-soft-ice mb-6">Browse and claim assignments from 50+ active real-world business projects.</p>
-                        <div class="overflow-x-auto">
-                            <table class="w-full">
-                                <thead>
-                                    <tr class="border-b border-surface-teal/50">
-                                        <th class="text-left py-3 px-4 text-soft-ice font-medium">Project Name</th>
-                                        <th class="text-left py-3 px-4 text-soft-ice font-medium">Budget</th>
-                                        <th class="text-left py-3 px-4 text-soft-ice font-medium">Timeline</th>
-                                        <th class="text-left py-3 px-4 text-soft-ice font-medium">Skills Required</th>
-                                        <th class="text-left py-3 px-4 text-soft-ice font-medium">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="projects-table-body">
-                                    <!-- Projects loaded via JavaScript -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <h3 class="text-xl font-bold mb-3">Elite Vetting</h3>
+                    <p class="text-soft-ice">Only the top 5% of student talent are curated into our network.</p>
                 </div>
                 
-                <!-- Commercial Capital Dashboard -->
-                <div class="glass-effect rounded-xl p-6 mb-10">
-                    <h3 class="text-xl font-bold mb-6">Commercial Capital Dashboard</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div class="glass-dark rounded-xl p-5">
-                            <p class="text-soft-ice text-sm mb-2">Total Earnings</p>
-                            <p id="total-earnings" class="text-3xl font-bold text-accent-teal">$24,850</p>
-                            <p class="text-soft-ice text-xs mt-2">Lifetime revenue</p>
-                        </div>
-                        <div class="glass-dark rounded-xl p-5">
-                            <p class="text-soft-ice text-sm mb-2">Pending Payments</p>
-                            <p id="pending-payments" class="text-3xl font-bold text-accent-teal">$3,200</p>
-                            <p class="text-soft-ice text-xs mt-2">Awaiting approval</p>
-                        </div>
-                        <div class="glass-dark rounded-xl p-5">
-                            <p class="text-soft-ice text-sm mb-2">Avg. Project Value</p>
-                            <p id="avg-project-value" class="text-3xl font-bold text-accent-teal">$2,750</p>
-                            <p class="text-soft-ice text-xs mt-2">Last 6 projects</p>
-                        </div>
+                <!-- Card 3 -->
+                <div class="glass-effect rounded-xl p-6 transition-all duration-500 hover:scale-[1.03] hover:shadow-lg">
+                    <div class="w-14 h-14 rounded-full gradient-accent flex items-center justify-center mb-6">
+                        <i class="fas fa-shield-alt text-2xl text-primary-dark"></i>
                     </div>
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div>
-                            <h4 class="font-bold mb-4">Monthly Earnings Trend</h4>
-                            <div class="chart-container">
-                                <canvas id="earningsChart"></canvas>
-                            </div>
-                        </div>
-                        <div>
-                            <h4 class="font-bold mb-4">Payment Status</h4>
-                            <div class="chart-container">
-                                <canvas id="paymentChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
+                    <h3 class="text-xl font-bold mb-3">Badge & Strike System</h3>
+                    <p class="text-soft-ice">Professional accountability ensuring luxury-grade quality.</p>
                 </div>
                 
-                <!-- Support & Tools Section -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
-                    <!-- Support Bridge -->
-                    <div class="glass-effect rounded-xl p-6">
-                        <h3 class="text-xl font-bold mb-6">Support Bridge</h3>
-                        <div class="space-y-6">
-                            <div class="glass-dark rounded-xl p-5">
-                                <div class="flex items-center mb-4">
-                                    <div class="w-12 h-12 rounded-full bg-surface-teal/60 flex items-center justify-center mr-4">
-                                        <i class="fas fa-users text-accent-teal"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="font-bold">HR Lead Connection</h4>
-                                        <p class="text-sm text-soft-ice">Career guidance & conflict resolution</p>
-                                    </div>
-                                </div>
-                                <p class="text-soft-ice mb-4">Connect with our HR team for professional development, contract questions, or workplace concerns.</p>
-                                <button class="w-full px-4 py-2 rounded-lg border border-accent-teal text-accent-teal hover:bg-accent-teal/10 transition-all duration-300">
-                                    <i class="fas fa-comment-alt mr-2"></i> Open HR Chat
-                                </button>
-                            </div>
-                            
-                            <div class="glass-dark rounded-xl p-5">
-                                <div class="flex items-center mb-4">
-                                    <div class="w-12 h-12 rounded-full bg-surface-teal/60 flex items-center justify-center mr-4">
-                                        <i class="fas fa-headset text-accent-teal"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="font-bold">24/7 Technical Support</h4>
-                                        <div class="flex items-center">
-                                            <div class="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
-                                            <p class="text-sm text-soft-ice">Available now</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <p class="text-soft-ice mb-4">Immediate assistance for technical issues, platform bugs, or urgent client communication needs.</p>
-                                <button class="w-full px-4 py-2 rounded-lg bg-accent-teal text-primary-dark hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300">
-                                    <i class="fas fa-phone-alt mr-2"></i> Request Callback
-                                </button>
-                            </div>
-                        </div>
+                <!-- Card 4 -->
+                <div class="glass-effect rounded-xl p-6 transition-all duration-500 hover:scale-[1.03] hover:shadow-lg">
+                    <div class="w-14 h-14 rounded-full gradient-accent flex items-center justify-center mb-6">
+                        <i class="fas fa-bolt text-2xl text-primary-dark"></i>
                     </div>
-                    
-                    <!-- Commercial Tools -->
-                    <div class="glass-effect rounded-xl p-6">
-                        <h3 class="text-xl font-bold mb-6">Commercial & Support Tools</h3>
-                        <div class="space-y-6">
-                            <div class="glass-dark rounded-xl p-5">
-                                <h4 class="font-bold mb-4">Premium API Keys</h4>
-                                <div class="mb-4">
-                                    <div class="flex justify-between items-center mb-2">
-                                        <span class="text-soft-ice">OpenAI API Key</span>
-                                        <div class="flex items-center">
-                                            <div class="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
-                                            <span class="text-xs text-soft-ice">Active</span>
-                                        </div>
-                                    </div>
-                                    <div class="flex">
-                                        <input type="text" readonly value="sk-••••••••••••••••••••••••" class="flex-grow px-4 py-2 rounded-l-lg bg-surface-teal/30 border border-surface-teal/50 text-soft-ice" id="openai-key-input">
-                                        <button onclick="copyToClipboard('openai-key-input')" class="px-4 py-2 rounded-r-lg bg-surface-teal/50 text-soft-ice hover:bg-surface-teal/60 transition-colors">
-                                            <i class="fas fa-copy"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <div>
-                                    <div class="flex justify-between items-center mb-2">
-                                        <span class="text-soft-ice">Stripe Secret Key</span>
-                                        <div class="flex items-center">
-                                            <div class="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
-                                            <span class="text-xs text-soft-ice">Active</span>
-                                        </div>
-                                    </div>
-                                    <div class="flex">
-                                        <input type="text" readonly value="sk_live_••••••••••••••••••••" class="flex-grow px-4 py-2 rounded-l-lg bg-surface-teal/30 border border-surface-teal/50 text-soft-ice" id="stripe-key-input">
-                                        <button onclick="copyToClipboard('stripe-key-input')" class="px-4 py-2 rounded-r-lg bg-surface-teal/50 text-soft-ice hover:bg-surface-teal/60 transition-colors">
-                                            <i class="fas fa-copy"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="glass-dark rounded-xl p-5">
-                                <h4 class="font-bold mb-4">Hosting Environments</h4>
-                                <div class="space-y-3">
-                                    <div class="flex justify-between items-center">
-                                        <div>
-                                            <p class="font-medium">Production Server</p>
-                                            <p class="text-xs text-soft-ice">DigitalOcean Droplet</p>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <div class="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
-                                            <span class="text-xs text-accent-teal">Online</span>
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <div>
-                                            <p class="font-medium">Staging Environment</p>
-                                            <p class="text-xs text-soft-ice">Vercel Deployment</p>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <div class="w-2 h-2 rounded-full bg-yellow-500 mr-2"></div>
-                                            <span class="text-xs text-soft-ice">Maintenance</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button class="w-full mt-4 px-4 py-2 rounded-lg border border-accent-teal text-accent-teal hover:bg-accent-teal/10 transition-all duration-300">
-                                    <i class="fas fa-server mr-2"></i> Manage Environments
-                                </button>
-                            </div>
+                    <h3 class="text-xl font-bold mb-3">Rapid Prototyping</h3>
+                    <p class="text-soft-ice">Moving from idea to live product at startup speed.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services -->
+    <section id="services" class="py-20 px-6 md:px-12">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold mb-12 text-center">SERVICES SUITE</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Service 1 -->
+                <div class="glass-dark rounded-xl p-6 border border-surface-teal/30 hover:border-accent-teal/50 transition-all duration-300">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="w-12 h-12 rounded-lg gradient-accent flex items-center justify-center">
+                            <i class="fas fa-paint-brush text-xl text-primary-dark"></i>
                         </div>
+                        <span class="text-xs font-semibold px-3 py-1 rounded-full bg-surface-teal/40 text-accent-teal">PREMIUM</span>
                     </div>
+                    <h3 class="text-xl font-bold mb-3">Luxury Web Design</h3>
+                    <p class="text-soft-ice mb-6">High-end aesthetics and premium user experiences for luxury brands.</p>
                 </div>
                 
-                <!-- Account Settings -->
+                <!-- Service 2 -->
+                <div class="glass-dark rounded-xl p-6 border border-surface-teal/30 hover:border-accent-teal/50 transition-all duration-300">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="w-12 h-12 rounded-lg gradient-accent flex items-center justify-center">
+                            <i class="fas fa-shopping-cart text-xl text-primary-dark"></i>
+                        </div>
+                        <span class="text-xs font-semibold px-3 py-1 rounded-full bg-surface-teal/40 text-accent-teal">WHATSAPP API</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">E-Commerce Excellence</h3>
+                    <p class="text-soft-ice mb-6">High-speed stores with integrated WhatsApp ordering and payment gateways.</p>
+                </div>
+                
+                <!-- Service 3 -->
+                <div class="glass-dark rounded-xl p-6 border border-surface-teal/30 hover:border-accent-teal/50 transition-all duration-300">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="w-12 h-12 rounded-lg gradient-accent flex items-center justify-center">
+                            <i class="fas fa-robot text-xl text-primary-dark"></i>
+                        </div>
+                        <span class="text-xs font-semibold px-3 py-1 rounded-full bg-surface-teal/40 text-accent-teal">AUTOMATION</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Business Automation</h3>
+                    <p class="text-soft-ice mb-6">Custom tools for workflow optimization and process automation.</p>
+                </div>
+                
+                <!-- Service 4 -->
+                <div class="glass-dark rounded-xl p-6 border border-surface-teal/30 hover:border-accent-teal/50 transition-all duration-300">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="w-12 h-12 rounded-lg gradient-accent flex items-center justify-center">
+                            <i class="fas fa-shield-alt text-xl text-primary-dark"></i>
+                        </div>
+                        <span class="text-xs font-semibold px-3 py-1 rounded-full bg-surface-teal/40 text-accent-teal">24/7</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Technical Guardianship</h3>
+                    <p class="text-soft-ice mb-6">Round-the-clock maintenance, security monitoring, and performance optimization.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Showcase -->
+    <section id="showcase" class="py-20 px-6 md:px-12 bg-surface-teal/10">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold mb-12 text-center">LIVE PROJECT SHOWCASE</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Project 1 -->
                 <div class="glass-effect rounded-xl p-6">
-                    <h3 class="text-xl font-bold mb-6">Account Settings</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <button onclick="editDeveloperProfile()" class="glass-dark rounded-xl p-5 hover:border hover:border-accent-teal/40 transition-all duration-300 text-left">
-                            <div class="flex items-center mb-3">
-                                <div class="w-10 h-10 rounded-full bg-surface-teal/30 flex items-center justify-center mr-4">
-                                    <i class="fas fa-user text-accent-teal"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold">Profile</h4>
-                                    <p class="text-xs text-soft-ice">Update professional details</p>
-                                </div>
-                            </div>
-                        </button>
-                        
-                        <button onclick="showSecuritySettings()" class="glass-dark rounded-xl p-5 hover:border hover:border-accent-teal/40 transition-all duration-300 text-left">
-                            <div class="flex items-center mb-3">
-                                <div class="w-10 h-10 rounded-full bg-surface-teal/30 flex items-center justify-center mr-4">
-                                    <i class="fas fa-shield-alt text-accent-teal"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold">Security</h4>
-                                    <p class="text-xs text-soft-ice">Manage security preferences</p>
-                                </div>
-                            </div>
-                        </button>
-                        
-                        <button onclick="logout()" class="glass-dark rounded-xl p-5 hover:border hover:border-accent-teal/40 transition-all duration-300 text-left">
-                            <div class="flex items-center mb-3">
-                                <div class="w-10 h-10 rounded-full bg-surface-teal/30 flex items-center justify-center mr-4">
-                                    <i class="fas fa-sign-out-alt text-accent-teal"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold">Logout</h4>
-                                    <p class="text-xs text-soft-ice">Safely exit the platform</p>
-                                </div>
-                            </div>
-                        </button>
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">Gaanyogi Tours & Travels</h3>
+                            <span class="status-pill status-live">LIVE</span>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-soft-ice text-sm">Deployment Phase</div>
+                            <div class="text-2xl font-bold text-accent-teal">100%</div>
+                        </div>
+                    </div>
+                    <p class="text-soft-ice mb-6">Complete travel portal with booking engine, payment integration, and admin dashboard.</p>
+                    <div class="w-full h-2 rounded-full bg-surface-teal/50 mb-6">
+                        <div class="h-full rounded-full bg-accent-teal w-full"></div>
+                    </div>
+                </div>
+                
+                <!-- Project 2 -->
+                <div class="glass-effect rounded-xl p-6">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">BullNexAI</h3>
+                            <span class="status-pill status-deployment">DEPLOYMENT</span>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-soft-ice text-sm">Development Phase</div>
+                            <div class="text-2xl font-bold text-accent-teal">75%</div>
+                        </div>
+                    </div>
+                    <p class="text-soft-ice mb-6">AI-powered financial analytics platform with predictive modeling.</p>
+                    <div class="w-full h-2 rounded-full bg-surface-teal/50 mb-6">
+                        <div class="h-full rounded-full bg-accent-teal w-3/4"></div>
+                    </div>
+                </div>
+                
+                <!-- Project 3 -->
+                <div class="glass-effect rounded-xl p-6">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">convertdoc.ai</h3>
+                            <span class="status-pill status-design">DESIGN</span>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-soft-ice text-sm">Design Phase</div>
+                            <div class="text-2xl font-bold text-accent-teal">40%</div>
+                        </div>
+                    </div>
+                    <p class="text-soft-ice mb-6">Document conversion SaaS with AI-enhanced formatting and OCR technology.</p>
+                    <div class="w-full h-2 rounded-full bg-surface-teal/50 mb-6">
+                        <div class="h-full rounded-full bg-accent-teal w-2/5"></div>
                     </div>
                 </div>
             </div>
-        </section>
-    </main>
+        </div>
+    </section>
 
     <!-- Footer -->
-    <footer class="glass-dark mt-20 py-10 px-6 md:px-12">
+    <footer class="glass-dark py-10 px-6 md:px-12 mt-20">
         <div class="container mx-auto">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
                 <div>
@@ -1070,15 +430,15 @@
                         </div>
                         <span class="font-orbitron text-2xl font-bold text-accent-teal tracking-wider">CODENPROFIT</span>
                     </div>
-                    <p class="text-soft-ice mb-6">Turning elite student talent into commercial capital through direct connections and zero agency fees.</p>
+                    <p class="text-soft-ice mb-6">Turning elite student talent into commercial capital through direct connections.</p>
                     <div class="flex space-x-4">
-                        <a href="#" class="w-10 h-10 rounded-full bg-surface-teal/30 flex items-center justify-center hover:bg-accent-teal/20 transition-colors">
+                        <a href="#" class="w-10 h-10 rounded-full bg-surface-teal/30 flex items-center justify-center hover:bg-accent-teal/20">
                             <i class="fab fa-twitter text-accent-teal"></i>
                         </a>
-                        <a href="#" class="w-10 h-10 rounded-full bg-surface-teal/30 flex items-center justify-center hover:bg-accent-teal/20 transition-colors">
+                        <a href="#" class="w-10 h-10 rounded-full bg-surface-teal/30 flex items-center justify-center hover:bg-accent-teal/20">
                             <i class="fab fa-linkedin-in text-accent-teal"></i>
                         </a>
-                        <a href="#" class="w-10 h-10 rounded-full bg-surface-teal/30 flex items-center justify-center hover:bg-accent-teal/20 transition-colors">
+                        <a href="#" class="w-10 h-10 rounded-full bg-surface-teal/30 flex items-center justify-center hover:bg-accent-teal/20">
                             <i class="fab fa-github text-accent-teal"></i>
                         </a>
                     </div>
@@ -1087,1251 +447,54 @@
                 <div>
                     <h4 class="text-lg font-bold mb-6">Platform</h4>
                     <ul class="space-y-3">
-                        <li><a href="#" onclick="showPage('landing')" class="text-soft-ice hover:text-accent-teal transition-colors">Home</a></li>
-                        <li><a href="#difference" onclick="showPage('landing')" class="text-soft-ice hover:text-accent-teal transition-colors">The Difference</a></li>
-                        <li><a href="#services" onclick="showPage('landing')" class="text-soft-ice hover:text-accent-teal transition-colors">Services</a></li>
-                        <li><a href="#showcase" onclick="showPage('landing')" class="text-soft-ice hover:text-accent-teal transition-colors">Showcase</a></li>
+                        <li><a href="#difference" class="text-soft-ice hover:text-accent-teal">The Difference</a></li>
+                        <li><a href="#services" class="text-soft-ice hover:text-accent-teal">Services</a></li>
+                        <li><a href="#showcase" class="text-soft-ice hover:text-accent-teal">Showcase</a></li>
+                        <li><a href="auth.html?action=signup" class="text-soft-ice hover:text-accent-teal">Join Now</a></li>
                     </ul>
                 </div>
                 
                 <div>
-                    <h4 class="text-lg font-bold mb-6">Legal</h4>
+                    <h4 class="text-lg font-bold mb-6">For</h4>
                     <ul class="space-y-3">
-                        <li><a href="privacy.html" class="text-soft-ice hover:text-accent-teal transition-colors">Privacy Policy</a></li>
-                        <li><a href="terms.html" class="text-soft-ice hover:text-accent-teal transition-colors">Terms of Service</a></li>
-                        <li><a href="#" class="text-soft-ice hover:text-accent-teal transition-colors">Cookie Policy</a></li>
-                        <li><a href="#" class="text-soft-ice hover:text-accent-teal transition-colors">Code of Conduct</a></li>
+                        <li><a href="host.html" class="text-soft-ice hover:text-accent-teal">Business Hosts</a></li>
+                        <li><a href="dev.html" class="text-soft-ice hover:text-accent-teal">Developers</a></li>
+                        <li><a href="auth.html?action=login" class="text-soft-ice hover:text-accent-teal">Login</a></li>
+                        <li><a href="auth.html?action=signup" class="text-soft-ice hover:text-accent-teal">Sign Up</a></li>
                     </ul>
                 </div>
                 
                 <div>
-                    <h4 class="text-lg font-bold mb-6">Mission Statement</h4>
-                    <p class="text-soft-ice italic">"To kill the 'Entry Level' barrier and democratize professional tech by building digital legacies. We believe talent should be measured by skill, not years of experience."</p>
+                    <h4 class="text-lg font-bold mb-6">Mission</h4>
+                    <p class="text-soft-ice italic">"To kill the 'Entry Level' barrier and democratize professional tech by building digital legacies."</p>
                 </div>
             </div>
             
             <div class="pt-8 border-t border-surface-teal/30 text-center text-soft-ice">
-                <p>&copy; 2023 CODENPROFIT. All rights reserved. Built with precision for the future of work.</p>
+                <p>&copy; 2023 CODENPROFIT. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
-    <!-- Auth Modal -->
-    <div id="authModal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden">
-        <div class="glass-effect rounded-2xl p-8 w-full max-w-md mx-4">
-            <div class="flex justify-between items-center mb-8">
-                <h3 id="authModalTitle" class="text-2xl font-bold"></h3>
-                <button onclick="closeAuthModal()" class="text-soft-ice hover:text-accent-teal" aria-label="Close modal">
-                    <i class="fas fa-times text-2xl"></i>
-                </button>
-            </div>
-            
-            <div id="loginForm" class="hidden">
-                <div class="space-y-6">
-                    <div>
-                        <label for="loginEmail" class="block text-soft-ice mb-2">Email Address</label>
-                        <input type="email" id="loginEmail" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" placeholder="you@example.com">
-                    </div>
-                    
-                    <div>
-                        <label for="loginPassword" class="block text-soft-ice mb-2">Password</label>
-                        <input type="password" id="loginPassword" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" placeholder="••••••••">
-                    </div>
-                    
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <input type="checkbox" id="remember" class="mr-2">
-                            <label for="remember" class="text-soft-ice text-sm">Remember me</label>
-                        </div>
-                        <button type="button" onclick="forgotPassword()" class="text-accent-teal text-sm hover:underline bg-transparent border-none p-0">Forgot password?</button>
-                    </div>
-                    
-                    <button onclick="simulateLogin()" class="w-full py-3 rounded-lg bg-accent-teal text-primary-dark font-semibold hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300">
-                        Sign In
-                    </button>
-                    
-                    <div class="relative my-6">
-                        <div class="absolute inset-0 flex items-center">
-                            <div class="w-full border-t border-surface-teal/50"></div>
-                        </div>
-                        <div class="relative flex justify-center text-sm">
-                            <span class="px-4 bg-primary-dark text-soft-ice">Or continue with</span>
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-4">
-                        <button onclick="loginWithGoogle()" class="py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-soft-ice hover:bg-surface-teal/40 transition-colors flex items-center justify-center">
-                            <i class="fab fa-google mr-2"></i> Google
-                        </button>
-                        <button onclick="loginWithGitHub()" class="py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-soft-ice hover:bg-surface-teal/40 transition-colors flex items-center justify-center">
-                            <i class="fab fa-github mr-2"></i> GitHub
-                        </button>
-                    </div>
-                    
-                    <p class="text-center text-soft-ice mt-6">
-                        Don't have an account? 
-                        <button onclick="showAuthModal('signup')" class="text-accent-teal hover:underline ml-1 bg-transparent border-none p-0">Sign up</button>
-                    </p>
-                </div>
-            </div>
-            
-            <div id="signupForm" class="hidden">
-                <div class="space-y-6">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label for="signupFirstName" class="block text-soft-ice mb-2">First Name</label>
-                            <input type="text" id="signupFirstName" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" placeholder="John">
-                        </div>
-                        <div>
-                            <label for="signupLastName" class="block text-soft-ice mb-2">Last Name</label>
-                            <input type="text" id="signupLastName" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" placeholder="Doe">
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label for="signupEmail" class="block text-soft-ice mb-2">Email Address</label>
-                        <input type="email" id="signupEmail" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" placeholder="you@example.com">
-                    </div>
-                    
-                    <div>
-                        <label for="signupPassword" class="block text-soft-ice mb-2">Password</label>
-                        <input type="password" id="signupPassword" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" placeholder="••••••••">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-soft-ice mb-2">Account Type</label>
-                        <div class="grid grid-cols-2 gap-4 mt-2">
-                            <button id="hostType" onclick="selectAccountType('host')" class="py-3 rounded-lg bg-accent-teal text-primary-dark font-medium">Host/Client</button>
-                            <button id="devType" onclick="selectAccountType('developer')" class="py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-soft-ice font-medium hover:bg-surface-teal/40">Developer</button>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center">
-                        <input type="checkbox" id="terms" class="mr-2">
-                        <label for="terms" class="text-soft-ice text-sm">I agree to the <a href="terms.html" class="text-accent-teal hover:underline">Terms of Service</a> and <a href="privacy.html" class="text-accent-teal hover:underline">Privacy Policy</a></label>
-                    </div>
-                    
-                    <button onclick="simulateSignup()" class="w-full py-3 rounded-lg bg-accent-teal text-primary-dark font-semibold hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300">
-                        Create Account
-                    </button>
-                    
-                    <p class="text-center text-soft-ice mt-6">
-                        Already have an account? 
-                        <button onclick="showAuthModal('login')" class="text-accent-teal hover:underline ml-1 bg-transparent border-none p-0">Sign in</button>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Profile Edit Modal -->
-    <div id="profileModal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden">
-        <div class="glass-effect rounded-2xl p-8 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-8">
-                <h3 id="profileModalTitle" class="text-2xl font-bold"></h3>
-                <button onclick="closeProfileModal()" class="text-soft-ice hover:text-accent-teal" aria-label="Close modal">
-                    <i class="fas fa-times text-2xl"></i>
-                </button>
-            </div>
-            
-            <div id="hostProfileForm" class="hidden">
-                <form id="hostProfileUpdateForm" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="editCompanyName" class="block text-soft-ice mb-2">Company Name *</label>
-                            <input type="text" id="editCompanyName" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" value="TechNova Solutions">
-                        </div>
-                        <div>
-                            <label for="editIndustry" class="block text-soft-ice mb-2">Industry *</label>
-                            <select id="editIndustry" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal">
-                                <option value="tech" selected>Technology</option>
-                                <option value="luxury-retail">Luxury Retail</option>
-                                <option value="finance">Finance</option>
-                                <option value="healthcare">Healthcare</option>
-                                <option value="travel">Travel & Hospitality</option>
-                                <option value="education">Education</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-soft-ice mb-2">Subscription Plan</label>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div class="relative">
-                                <input type="radio" id="plan-basic" name="subscription" value="basic" class="hidden peer">
-                                <label for="plan-basic" class="block p-4 rounded-lg border border-surface-teal/50 peer-checked:border-accent-teal peer-checked:bg-accent-teal/10 cursor-pointer transition-all">
-                                    <div class="font-bold">Basic</div>
-                                    <div class="text-sm text-soft-ice mt-1">$99/month</div>
-                                </label>
-                            </div>
-                            <div class="relative">
-                                <input type="radio" id="plan-pro" name="subscription" value="pro" class="hidden peer" checked>
-                                <label for="plan-pro" class="block p-4 rounded-lg border border-surface-teal/50 peer-checked:border-accent-teal peer-checked:bg-accent-teal/10 cursor-pointer transition-all">
-                                    <div class="font-bold">Pro</div>
-                                    <div class="text-sm text-soft-ice mt-1">$299/month</div>
-                                </label>
-                            </div>
-                            <div class="relative">
-                                <input type="radio" id="plan-elite" name="subscription" value="elite" class="hidden peer">
-                                <label for="plan-elite" class="block p-4 rounded-lg border border-surface-teal/50 peer-checked:border-accent-teal peer-checked:bg-accent-teal/10 cursor-pointer transition-all">
-                                    <div class="font-bold">Elite</div>
-                                    <div class="text-sm text-soft-ice mt-1">$599/month</div>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label for="editBusinessDesc" class="block text-soft-ice mb-2">Business Description</label>
-                        <textarea id="editBusinessDesc" rows="4" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal">Leading technology solutions provider for enterprise clients.</textarea>
-                    </div>
-                    
-                    <div class="flex justify-end space-x-4">
-                        <button type="button" onclick="closeProfileModal()" class="px-6 py-3 rounded-lg border border-accent-teal text-accent-teal hover:bg-accent-teal/10 transition-all duration-300">Cancel</button>
-                        <button type="submit" class="px-6 py-3 rounded-lg bg-accent-teal text-primary-dark font-semibold hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300">Save Changes</button>
-                    </div>
-                </form>
-            </div>
-            
-            <div id="developerProfileForm" class="hidden">
-                <form id="developerProfileUpdateForm" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="editDevName" class="block text-soft-ice mb-2">Display Name *</label>
-                            <input type="text" id="editDevName" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" value="Aarav Jain">
-                        </div>
-                        <div>
-                            <label for="editDevRole" class="block text-soft-ice mb-2">Primary Role *</label>
-                            <select id="editDevRole" required class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal">
-                                <option value="full-stack" selected>Full Stack Developer</option>
-                                <option value="frontend">Frontend Developer</option>
-                                <option value="backend">Backend Developer</option>
-                                <option value="ui-ux">UI/UX Designer</option>
-                                <option value="devops">DevOps Engineer</option>
-                                <option value="ai-ml">AI/ML Specialist</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label for="editPortfolio" class="block text-soft-ice mb-2">Portfolio Website</label>
-                        <input type="url" id="editPortfolio" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" placeholder="https://yourportfolio.com" value="https://portfolio.aaravjain.dev">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-soft-ice mb-2">Technical Skills</label>
-                        <div class="flex flex-wrap gap-2 mb-4" id="skillTags">
-                            <span class="skill-tag">JavaScript</span>
-                            <span class="skill-tag">React</span>
-                            <span class="skill-tag">Node.js</span>
-                            <span class="skill-tag">Python</span>
-                            <span class="skill-tag">UI/UX</span>
-                            <span class="skill-tag">API Development</span>
-                        </div>
-                        <div class="flex">
-                            <input type="text" id="newSkill" class="flex-grow px-4 py-3 rounded-l-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal" placeholder="Add a skill">
-                            <button type="button" onclick="addSkill()" class="px-4 py-3 rounded-r-lg bg-accent-teal text-primary-dark font-medium">Add</button>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label for="editDevBio" class="block text-soft-ice mb-2">Professional Bio</label>
-                        <textarea id="editDevBio" rows="4" class="w-full px-4 py-3 rounded-lg bg-surface-teal/30 border border-surface-teal/50 text-pure-blue focus:outline-none focus:border-accent-teal">Full-stack developer with expertise in modern web technologies. Passionate about building scalable applications and user-centric experiences.</textarea>
-                    </div>
-                    
-                    <div class="flex justify-end space-x-4">
-                        <button type="button" onclick="closeProfileModal()" class="px-6 py-3 rounded-lg border border-accent-teal text-accent-teal hover:bg-accent-teal/10 transition-all duration-300">Cancel</button>
-                        <button type="submit" class="px-6 py-3 rounded-lg bg-accent-teal text-primary-dark font-semibold hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300">Save Profile</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Success Notification -->
-    <div id="successNotification" class="fixed top-6 right-6 glass-effect rounded-lg p-4 shadow-lg z-50 transform translate-x-full transition-transform duration-300">
-        <div class="flex items-center">
-            <div class="w-10 h-10 rounded-full bg-accent-teal/20 flex items-center justify-center mr-4">
-                <i class="fas fa-check text-accent-teal"></i>
-            </div>
-            <div>
-                <p class="font-medium" id="notificationTitle">Success!</p>
-                <p class="text-sm text-soft-ice" id="notificationMessage">Operation completed successfully.</p>
-            </div>
-        </div>
-    </div>
-
+    <!-- Smooth Scroll -->
     <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyCVWDmz4Cc9KLvBwf7iLsQiL_9HdjFw4Zk",
-            authDomain: "watchfree-d9e16.firebaseapp.com",
-            projectId: "watchfree-d9e16",
-            storageBucket: "watchfree-d9e16.firebasestorage.app",
-            messagingSenderId: "4487476314",
-            appId: "1:4487476314:web:6dfa4e14a8660705b15463",
-            measurementId: "G-0GY2JYKLHJ"
-        };
-        
-        // Initialize Firebase (with error handling)
-        let firebaseInitialized = false;
-        let auth = null;
-        let db = null;
-        
-        try {
-            // Check if Firebase can be initialized in current environment
-            if (window.location.protocol === 'http:' || window.location.protocol === 'https:' || window.location.protocol === 'chrome-extension:') {
-                firebase.initializeApp(firebaseConfig);
-                auth = firebase.auth();
-                db = firebase.firestore();
-                firebaseInitialized = true;
-                console.log("Firebase initialized successfully");
-            } else {
-                console.warn("Firebase cannot be initialized in this environment. Using simulation mode.");
-            }
-        } catch (error) {
-            console.warn("Firebase initialization failed. Using simulation mode.", error);
-        }
-        
-        // Global State
-        let currentUser = null;
-        let userType = null;
-        let userData = null;
-        let currentPage = 'landing';
-        let selectedAccountType = 'host';
-        
-        // DOM Elements
-        const authModal = document.getElementById('authModal');
-        const loginForm = document.getElementById('loginForm');
-        const signupForm = document.getElementById('signupForm');
-        const authModalTitle = document.getElementById('authModalTitle');
-        const profileModal = document.getElementById('profileModal');
-        const profileModalTitle = document.getElementById('profileModalTitle');
-        const hostProfileForm = document.getElementById('hostProfileForm');
-        const developerProfileForm = document.getElementById('developerProfileForm');
-        const successNotification = document.getElementById('successNotification');
-        const navLinks = document.getElementById('nav-links');
-        const navButtons = document.getElementById('nav-buttons');
-        
-        // Charts
-        let devChart, projectChart;
-        let hostBudgetChart, earningsChart, paymentChart;
-        
-        // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
-            initCharts();
-            loadDeveloperProfiles();
-            loadProjectsMarketplace();
-            updateNavigation();
-            hideProjectSubmissionForm();
-            
-            // Try to initialize Firebase auth state listener
-            if (firebaseInitialized && auth) {
-                setupFirebaseAuth();
-            } else {
-                // Use simulated auth state
-                checkSimulatedAuthState();
-            }
-            
-            // Add form submission handlers
-            setupFormHandlers();
-        });
-        
-        // Setup form handlers
-        function setupFormHandlers() {
-            // Project form
-            const projectForm = document.getElementById('projectForm');
-            if (projectForm) {
-                projectForm.addEventListener('submit', function(e) {
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
                     e.preventDefault();
-                    handleProjectSubmission();
-                });
-            }
-            
-            // Host profile form
-            const hostProfileUpdateForm = document.getElementById('hostProfileUpdateForm');
-            if (hostProfileUpdateForm) {
-                hostProfileUpdateForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    handleHostProfileUpdate();
-                });
-            }
-            
-            // Developer profile form
-            const developerProfileUpdateForm = document.getElementById('developerProfileUpdateForm');
-            if (developerProfileUpdateForm) {
-                developerProfileUpdateForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    handleDeveloperProfileUpdate();
-                });
-            }
-        }
-        
-        // Simulated Firebase Authentication
-        function setupFirebaseAuth() {
-            if (!firebaseInitialized) return;
-            
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    // User is signed in
-                    currentUser = user;
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
                     
-                    // Get user data from Firestore
-                    if (db) {
-                        db.collection('users').doc(user.uid).get().then((doc) => {
-                            if (doc.exists) {
-                                userData = doc.data();
-                                userType = userData.userType;
-                                updateNavigation();
-                                showNotification('Success', `Welcome back, ${user.displayName || user.email}!`);
-                            }
-                        }).catch((error) => {
-                            console.error("Error getting user document:", error);
-                            // Use default user data
-                            userData = getDefaultUserData(user);
-                            userType = selectedAccountType;
-                            updateNavigation();
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 100,
+                            behavior: 'smooth'
                         });
-                    } else {
-                        // Use default user data
-                        userData = getDefaultUserData(user);
-                        userType = selectedAccountType;
-                        updateNavigation();
-                    }
-                } else {
-                    // User is signed out
-                    currentUser = null;
-                    userType = null;
-                    userData = null;
-                    updateNavigation();
-                }
-            });
-        }
-        
-        // Check simulated auth state from localStorage
-        function checkSimulatedAuthState() {
-            const savedUser = localStorage.getItem('codenprofit_user');
-            if (savedUser) {
-                const user = JSON.parse(savedUser);
-                currentUser = user;
-                userData = user.userData || getDefaultUserData(user);
-                userType = user.userType || 'host';
-                updateNavigation();
-            }
-        }
-        
-        // Get default user data
-        function getDefaultUserData(user) {
-            return {
-                uid: user?.uid || 'simulated-uid',
-                email: user?.email || 'user@example.com',
-                displayName: user?.displayName || 'Demo User',
-                userType: selectedAccountType,
-                companyName: 'TechNova Solutions',
-                industry: 'tech',
-                subscription: 'pro',
-                role: 'Full Stack Developer',
-                portfolio: 'https://portfolio.example.com',
-                badges: ['UI Master', 'Full Stack', 'React Expert'],
-                strikes: 0,
-                earnings: 24850,
-                pendingEarnings: 3200,
-                projectsCompleted: 8,
-                rating: 5.0
-            };
-        }
-        
-        // Page Navigation
-        function showPage(pageId) {
-            // Hide all pages
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active', 'fade-in');
-            });
-            
-            // Show selected page
-            const targetPage = document.getElementById(`${pageId}-page`);
-            if (targetPage) {
-                targetPage.classList.add('active');
-                setTimeout(() => {
-                    targetPage.classList.add('fade-in');
-                }, 10);
-                currentPage = pageId;
-                
-                // Update navigation
-                updateNavigation();
-                
-                // Initialize charts if needed
-                if (pageId === 'host' && !hostBudgetChart) {
-                    initHostDashboardCharts();
-                } else if (pageId === 'developer' && !earningsChart) {
-                    initDeveloperDashboardCharts();
-                }
-                
-                // Scroll to top
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        }
-        
-        // Update Navigation Bar
-        function updateNavigation() {
-            // Clear navigation
-            navLinks.innerHTML = '';
-            navButtons.innerHTML = '';
-            
-            if (currentUser) {
-                // User is logged in
-                const displayName = userData?.displayName || currentUser.email;
-                const initials = getInitials(displayName);
-                
-                // Navigation links based on page
-                if (currentPage === 'landing') {
-                    navLinks.innerHTML = `
-                        <a href="#difference" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">The Difference</a>
-                        <a href="#services" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Services</a>
-                        <a href="#showcase" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Showcase</a>
-                        <a href="#goal" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Our Goal</a>
-                        <a href="#testimonials" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Testimonials</a>
-                    `;
-                    
-                    // Dashboard button based on user type
-                    const dashboardBtn = document.createElement('button');
-                    dashboardBtn.className = 'px-5 py-2 rounded-lg border border-accent-teal text-accent-teal hover:bg-accent-teal/10 transition-all duration-300';
-                    dashboardBtn.innerHTML = userType === 'host' ? 
-                        '<i class="fas fa-building mr-2"></i> Host Dashboard' : 
-                        '<i class="fas fa-code mr-2"></i> Developer Dashboard';
-                    dashboardBtn.onclick = () => showPage(userType);
-                    
-                    navButtons.appendChild(dashboardBtn);
-                } else if (currentPage === 'host' || currentPage === 'developer') {
-                    navLinks.innerHTML = `
-                        <a href="#" onclick="showPage('landing')" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Home</a>
-                        <a href="#services" onclick="showPage('landing')" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Services</a>
-                        <a href="#showcase" onclick="showPage('landing')" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Showcase</a>
-                    `;
-                }
-                
-                // User info and logout button
-                const userInfo = document.createElement('div');
-                userInfo.className = 'flex items-center space-x-3';
-                userInfo.innerHTML = `
-                    <div class="flex items-center space-x-2">
-                        <div class="w-8 h-8 rounded-full gradient-accent flex items-center justify-center text-primary-dark font-semibold">${initials}</div>
-                        <span class="text-sm text-soft-ice hidden md:inline">${displayName.split(' ')[0]}</span>
-                    </div>
-                    <button onclick="logout()" class="px-4 py-1 rounded-lg border border-accent-teal text-accent-teal text-sm hover:bg-accent-teal/10 transition-all duration-300">Logout</button>
-                `;
-                
-                navButtons.appendChild(userInfo);
-                
-            } else {
-                // User is not logged in
-                if (currentPage === 'landing') {
-                    navLinks.innerHTML = `
-                        <a href="#difference" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">The Difference</a>
-                        <a href="#services" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Services</a>
-                        <a href="#showcase" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Showcase</a>
-                        <a href="#goal" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Our Goal</a>
-                        <a href="#testimonials" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Testimonials</a>
-                    `;
-                } else {
-                    navLinks.innerHTML = `
-                        <a href="#" onclick="showPage('landing')" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Home</a>
-                        <a href="#services" onclick="showPage('landing')" class="text-soft-ice hover:text-accent-teal transition-colors duration-300">Services</a>
-                    `;
-                }
-                
-                // Login and signup buttons
-                navButtons.innerHTML = `
-                    <button onclick="showAuthModal('login')" class="px-5 py-2 rounded-lg border border-accent-teal text-accent-teal hover:bg-accent-teal/10 transition-all duration-300">Login</button>
-                    <button onclick="showAuthModal('signup')" class="px-5 py-2 rounded-lg bg-accent-teal text-primary-dark font-medium hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300 transform hover:scale-[1.03]">Join Movement</button>
-                `;
-            }
-        }
-        
-        // Get initials from name
-        function getInitials(name) {
-            return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-        }
-        
-        // Initialize Charts
-        function initCharts() {
-            // Power Metrics Charts
-            const devCtx = document.getElementById('devChart')?.getContext('2d');
-            if (devCtx) {
-                devChart = new Chart(devCtx, {
-                    type: 'line',
-                    data: {
-                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                        datasets: [{
-                            label: 'Developers',
-                            data: [50, 75, 100, 120, 140, 150],
-                            borderColor: '#3AAFA9',
-                            backgroundColor: 'rgba(58, 175, 169, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            x: { 
-                                grid: { color: 'rgba(222, 242, 241, 0.1)' },
-                                ticks: { color: '#DEF2F1' }
-                            },
-                            y: { 
-                                grid: { color: 'rgba(222, 242, 241, 0.1)' },
-                                ticks: { color: '#DEF2F1' }
-                            }
-                        }
                     }
                 });
-            }
-            
-            const projectCtx = document.getElementById('projectChart')?.getContext('2d');
-            if (projectCtx) {
-                projectChart = new Chart(projectCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                        datasets: [{
-                            label: 'Projects',
-                            data: [10, 18, 25, 35, 42, 50],
-                            backgroundColor: 'rgba(58, 175, 169, 0.7)',
-                            borderColor: '#3AAFA9',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            x: { 
-                                grid: { color: 'rgba(222, 242, 241, 0.1)' },
-                                ticks: { color: '#DEF2F1' }
-                            },
-                            y: { 
-                                grid: { color: 'rgba(222, 242, 241, 0.1)' },
-                                ticks: { color: '#DEF2F1' }
-                            }
-                        }
-                    }
-                });
-            }
-        }
-        
-        // Initialize Host Dashboard Charts
-        function initHostDashboardCharts() {
-            const budgetCtx = document.getElementById('hostBudgetChart')?.getContext('2d');
-            if (budgetCtx) {
-                hostBudgetChart = new Chart(budgetCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Development', 'Design', 'Testing', 'Maintenance'],
-                        datasets: [{
-                            data: [45, 25, 20, 10],
-                            backgroundColor: ['#3AAFA9', '#2B7A78', '#17252A', '#DEF2F1'],
-                            borderWidth: 0
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { 
-                                display: true,
-                                labels: { color: '#DEF2F1' }
-                            }
-                        },
-                        cutout: '60%'
-                    }
-                });
-            }
-        }
-        
-        // Initialize Developer Dashboard Charts
-        function initDeveloperDashboardCharts() {
-            const earningsCtx = document.getElementById('earningsChart')?.getContext('2d');
-            if (earningsCtx) {
-                earningsChart = new Chart(earningsCtx, {
-                    type: 'line',
-                    data: {
-                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-                        datasets: [{
-                            label: 'Earnings ($)',
-                            data: [1200, 1800, 2200, 2800, 3200, 3800, 4500],
-                            borderColor: '#3AAFA9',
-                            backgroundColor: 'rgba(58, 175, 169, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { 
-                            legend: { 
-                                labels: { color: '#DEF2F1' }
-                            }
-                        },
-                        scales: {
-                            x: { 
-                                grid: { color: 'rgba(222, 242, 241, 0.1)' },
-                                ticks: { color: '#DEF2F1' }
-                            },
-                            y: { 
-                                grid: { color: 'rgba(222, 242, 241, 0.1)' },
-                                ticks: { 
-                                    color: '#DEF2F1',
-                                    callback: function(value) {
-                                        return '$' + value;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-            
-            const paymentCtx = document.getElementById('paymentChart')?.getContext('2d');
-            if (paymentCtx) {
-                paymentChart = new Chart(paymentCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Paid', 'Pending', 'Upcoming'],
-                        datasets: [{
-                            data: [65, 20, 15],
-                            backgroundColor: ['#3AAFA9', '#2B7A78', '#17252A'],
-                            borderWidth: 0
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { 
-                                display: true,
-                                labels: { color: '#DEF2F1' }
-                            }
-                        },
-                        cutout: '60%'
-                    }
-                });
-            }
-        }
-        
-        // Load Developer Profiles for Host Dashboard
-        function loadDeveloperProfiles() {
-            const developerGrid = document.getElementById('developer-grid');
-            if (!developerGrid) return;
-            
-            const developers = [
-                {
-                    id: 1,
-                    name: 'Aarav Jain',
-                    initials: 'AJ',
-                    role: 'Full Stack Developer',
-                    rating: 4.9,
-                    successRate: 98,
-                    skills: ['React', 'Node.js', 'UI/UX'],
-                    badges: ['UI Master', 'Full Stack', 'E-commerce Expert']
-                },
-                {
-                    id: 2,
-                    name: 'Priya Kumar',
-                    initials: 'PK',
-                    role: 'AI/ML Specialist',
-                    rating: 4.8,
-                    successRate: 96,
-                    skills: ['Python', 'AI/ML', 'Data Science'],
-                    badges: ['AI/ML Expert', 'Data Scientist', 'Python Pro']
-                },
-                {
-                    id: 3,
-                    name: 'Rohan Sharma',
-                    initials: 'RS',
-                    role: 'DevOps Engineer',
-                    rating: 5.0,
-                    successRate: 100,
-                    skills: ['DevOps', 'Security', 'Cloud'],
-                    badges: ['DevOps Master', 'Security Expert', 'Cloud Architect']
-                }
-            ];
-            
-            developerGrid.innerHTML = '';
-            
-            developers.forEach(dev => {
-                const devCard = document.createElement('div');
-                devCard.className = 'glass-dark rounded-xl p-5 hover:border hover:border-accent-teal/40 transition-all duration-300';
-                devCard.innerHTML = `
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 rounded-full gradient-accent flex items-center justify-center mr-4">
-                            <span class="font-bold text-primary-dark">${dev.initials}</span>
-                        </div>
-                        <div>
-                            <h4 class="font-bold">${dev.name}</h4>
-                            <div class="flex items-center">
-                                <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
-                                <span class="text-sm text-soft-ice">${dev.rating}/5.0</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex flex-wrap gap-2 mb-4">
-                        ${dev.skills.map(skill => `<span class="text-xs px-2 py-1 rounded-full bg-surface-teal/40 text-soft-ice">${skill}</span>`).join('')}
-                    </div>
-                    <div class="flex flex-wrap gap-2 mb-4">
-                        ${dev.badges.map(badge => `<span class="badge badge-premium">${badge}</span>`).join('')}
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="text-sm text-soft-ice">Success Rate</p>
-                            <p class="font-bold text-accent-teal">${dev.successRate}%</p>
-                        </div>
-                        <button onclick="selectDeveloper(${dev.id})" class="px-4 py-2 rounded-lg bg-accent-teal text-primary-dark text-sm font-medium hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300">Select</button>
-                    </div>
-                `;
-                developerGrid.appendChild(devCard);
             });
-        }
-        
-        // Load Projects Marketplace for Developer Dashboard
-        function loadProjectsMarketplace() {
-            const tableBody = document.getElementById('projects-table-body');
-            if (!tableBody) return;
-            
-            const projects = [
-                {
-                    id: 1,
-                    name: 'E-commerce Dashboard Redesign',
-                    client: 'Luxury Retail Brand',
-                    budget: 3500,
-                    timeline: '3 weeks',
-                    skills: ['React', 'Chart.js', 'UI/UX'],
-                    status: 'available'
-                },
-                {
-                    id: 2,
-                    name: 'WhatsApp Commerce Integration',
-                    client: 'Fashion E-commerce',
-                    budget: 2800,
-                    timeline: '2 weeks',
-                    skills: ['Node.js', 'API', 'E-commerce'],
-                    status: 'available'
-                },
-                {
-                    id: 3,
-                    name: 'AI Chatbot Implementation',
-                    client: 'Healthcare Startup',
-                    budget: 4200,
-                    timeline: '4 weeks',
-                    skills: ['Python', 'AI/ML', 'NLP'],
-                    status: 'available'
-                }
-            ];
-            
-            tableBody.innerHTML = '';
-            
-            projects.forEach(project => {
-                const row = document.createElement('tr');
-                row.className = 'border-b border-surface-teal/20 hover:bg-surface-teal/10 transition-colors';
-                row.innerHTML = `
-                    <td class="py-4 px-4">
-                        <div class="font-medium">${project.name}</div>
-                        <div class="text-sm text-soft-ice">${project.client}</div>
-                    </td>
-                    <td class="py-4 px-4">
-                        <div class="font-bold text-accent-teal">$${project.budget.toLocaleString()}</div>
-                    </td>
-                    <td class="py-4 px-4">${project.timeline}</td>
-                    <td class="py-4 px-4">
-                        <div class="flex flex-wrap gap-1">
-                            ${project.skills.map(skill => `<span class="text-xs px-2 py-1 rounded-full bg-surface-teal/40 text-soft-ice">${skill}</span>`).join('')}
-                        </div>
-                    </td>
-                    <td class="py-4 px-4">
-                        <button onclick="claimProject(${project.id})" class="px-4 py-2 rounded-lg bg-accent-teal text-primary-dark text-sm font-medium hover:shadow-lg hover:shadow-accent-teal/30 transition-all duration-300">Claim Project</button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
-        }
-        
-        // Auth Modal Functions
-        function showAuthModal(type) {
-            authModal.classList.remove('hidden');
-            
-            if (type === 'login') {
-                authModalTitle.textContent = 'Sign In to Codenprofit';
-                loginForm.classList.remove('hidden');
-                signupForm.classList.add('hidden');
-            } else {
-                authModalTitle.textContent = 'Join the Movement';
-                loginForm.classList.add('hidden');
-                signupForm.classList.remove('hidden');
-                selectAccountType('host'); // Default to host
-            }
-        }
-        
-        function closeAuthModal() {
-            authModal.classList.add('hidden');
-        }
-        
-        function selectAccountType(type) {
-            selectedAccountType = type;
-            
-            if (type === 'host') {
-                document.getElementById('hostType').classList.add('bg-accent-teal', 'text-primary-dark');
-                document.getElementById('hostType').classList.remove('bg-surface-teal/30', 'text-soft-ice', 'border', 'border-surface-teal/50');
-                
-                document.getElementById('devType').classList.add('bg-surface-teal/30', 'border', 'border-surface-teal/50', 'text-soft-ice');
-                document.getElementById('devType').classList.remove('bg-accent-teal', 'text-primary-dark');
-            } else {
-                document.getElementById('devType').classList.add('bg-accent-teal', 'text-primary-dark');
-                document.getElementById('devType').classList.remove('bg-surface-teal/30', 'text-soft-ice', 'border', 'border-surface-teal/50');
-                
-                document.getElementById('hostType').classList.add('bg-surface-teal/30', 'border', 'border-surface-teal/50', 'text-soft-ice');
-                document.getElementById('hostType').classList.remove('bg-accent-teal', 'text-primary-dark');
-            }
-        }
-        
-        // Simulated Authentication Functions
-        function simulateLogin() {
-            const email = document.getElementById('loginEmail').value || 'demo@example.com';
-            const password = document.getElementById('loginPassword').value || 'password';
-            
-            if (!email) {
-                showNotification('Error', 'Please enter email address.');
-                return;
-            }
-            
-            // Simulate user
-            const user = {
-                uid: 'simulated-user-' + Date.now(),
-                email: email,
-                displayName: email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1)
-            };
-            
-            currentUser = user;
-            userType = selectedAccountType;
-            userData = getDefaultUserData(user);
-            
-            // Save to localStorage for persistence
-            localStorage.setItem('codenprofit_user', JSON.stringify({
-                uid: user.uid,
-                email: user.email,
-                displayName: user.displayName,
-                userType: userType,
-                userData: userData
-            }));
-            
-            closeAuthModal();
-            updateNavigation();
-            showNotification('Success', `Welcome back, ${user.displayName}!`);
-            
-            // Redirect to appropriate dashboard
-            setTimeout(() => {
-                showPage(userType);
-            }, 1000);
-        }
-        
-        function simulateSignup() {
-            const firstName = document.getElementById('signupFirstName').value || 'Demo';
-            const lastName = document.getElementById('signupLastName').value || 'User';
-            const email = document.getElementById('signupEmail').value || 'demo@example.com';
-            const password = document.getElementById('signupPassword').value || 'password';
-            const terms = document.getElementById('terms').checked;
-            
-            if (!firstName || !lastName || !email) {
-                showNotification('Error', 'Please fill all required fields.');
-                return;
-            }
-            
-            if (!terms) {
-                showNotification('Error', 'Please agree to the terms and conditions.');
-                return;
-            }
-            
-            // Simulate user creation
-            const user = {
-                uid: 'simulated-user-' + Date.now(),
-                email: email,
-                displayName: `${firstName} ${lastName}`
-            };
-            
-            currentUser = user;
-            userType = selectedAccountType;
-            userData = getDefaultUserData(user);
-            
-            // Save to localStorage for persistence
-            localStorage.setItem('codenprofit_user', JSON.stringify({
-                uid: user.uid,
-                email: user.email,
-                displayName: user.displayName,
-                userType: userType,
-                userData: userData
-            }));
-            
-            closeAuthModal();
-            updateNavigation();
-            showNotification('Success', `Account created successfully, ${firstName}!`);
-            
-            // Redirect to appropriate dashboard
-            setTimeout(() => {
-                showPage(userType);
-            }, 1000);
-        }
-        
-        function loginWithGoogle() {
-            showNotification('Info', 'Google login would be implemented with Firebase in production.');
-            // For demo, simulate login
-            simulateLogin();
-        }
-        
-        function loginWithGitHub() {
-            showNotification('Info', 'GitHub login would be implemented with Firebase in production.');
-            // For demo, simulate login
-            simulateLogin();
-        }
-        
-        function forgotPassword() {
-            showNotification('Info', 'Password reset functionality would be implemented with Firebase in production.');
-        }
-        
-        function logout() {
-            currentUser = null;
-            userType = null;
-            userData = null;
-            
-            // Remove from localStorage
-            localStorage.removeItem('codenprofit_user');
-            
-            updateNavigation();
-            showPage('landing');
-            showNotification('Success', 'Logged out successfully!');
-        }
-        
-        // Project Submission Form
-        function showProjectSubmissionForm() {
-            document.getElementById('project-submission-form').classList.remove('hidden');
-        }
-        
-        function hideProjectSubmissionForm() {
-            document.getElementById('project-submission-form').classList.add('hidden');
-            document.getElementById('projectForm').reset();
-        }
-        
-        // Handle project form submission
-        function handleProjectSubmission() {
-            const projectName = document.getElementById('projectName').value;
-            const projectIndustry = document.getElementById('projectIndustry').value;
-            const projectBudget = document.getElementById('projectBudget').value;
-            const projectVision = document.getElementById('projectVision').value;
-            
-            if (!projectName || !projectIndustry || !projectBudget || !projectVision) {
-                showNotification('Error', 'Please fill all required fields.');
-                return;
-            }
-            
-            showNotification('Success', `Project "${projectName}" submitted successfully!`);
-            hideProjectSubmissionForm();
-            
-            // In a real app, this would save to Firestore
-            console.log('Project submitted:', {
-                name: projectName,
-                industry: projectIndustry,
-                budget: projectBudget,
-                vision: projectVision,
-                timestamp: new Date().toISOString()
-            });
-        }
-        
-        // Profile Modal Functions
-        function editHostProfile() {
-            profileModalTitle.textContent = 'Edit Business Profile';
-            hostProfileForm.classList.remove('hidden');
-            developerProfileForm.classList.add('hidden');
-            profileModal.classList.remove('hidden');
-        }
-        
-        function editDeveloperProfile() {
-            profileModalTitle.textContent = 'Edit Developer Profile';
-            developerProfileForm.classList.remove('hidden');
-            hostProfileForm.classList.add('hidden');
-            profileModal.classList.remove('hidden');
-        }
-        
-        function closeProfileModal() {
-            profileModal.classList.add('hidden');
-        }
-        
-        function addSkill() {
-            const newSkillInput = document.getElementById('newSkill');
-            const skillText = newSkillInput.value.trim();
-            
-            if (skillText) {
-                const skillTags = document.getElementById('skillTags');
-                const skillTag = document.createElement('span');
-                skillTag.className = 'skill-tag';
-                skillTag.textContent = skillText;
-                skillTags.appendChild(skillTag);
-                newSkillInput.value = '';
-            }
-        }
-        
-        // Handle profile form submissions
-        function handleHostProfileUpdate() {
-            const companyName = document.getElementById('editCompanyName').value;
-            const industry = document.getElementById('editIndustry').value;
-            const subscription = document.querySelector('input[name="subscription"]:checked').value;
-            const businessDesc = document.getElementById('editBusinessDesc').value;
-            
-            // Update displayed values
-            document.getElementById('host-company-name').textContent = companyName;
-            document.getElementById('host-industry').textContent = formatIndustry(industry);
-            document.getElementById('host-subscription').textContent = formatSubscription(subscription);
-            
-            closeProfileModal();
-            showNotification('Success', 'Business profile updated successfully!');
-        }
-        
-        function handleDeveloperProfileUpdate() {
-            const devName = document.getElementById('editDevName').value;
-            const devRole = document.getElementById('editDevRole').value;
-            const portfolio = document.getElementById('editPortfolio').value;
-            const devBio = document.getElementById('editDevBio').value;
-            
-            // Update displayed values
-            document.getElementById('dev-name').textContent = devName;
-            document.getElementById('dev-role').textContent = formatRole(devRole);
-            document.getElementById('dev-portfolio').textContent = portfolio || 'Add portfolio link';
-            document.getElementById('dev-portfolio').href = portfolio || '#';
-            
-            closeProfileModal();
-            showNotification('Success', 'Developer profile updated successfully!');
-        }
-        
-        // Utility Functions
-        function formatIndustry(industry) {
-            const industryMap = {
-                'luxury-retail': 'Luxury Retail',
-                'tech': 'Technology',
-                'finance': 'Finance',
-                'healthcare': 'Healthcare',
-                'travel': 'Travel & Hospitality',
-                'education': 'Education',
-                'other': 'Other'
-            };
-            return industryMap[industry] || 'Technology';
-        }
-        
-        function formatSubscription(subscription) {
-            const subscriptionMap = {
-                'basic': 'Basic ($99/month)',
-                'pro': 'Pro ($299/month)',
-                'elite': 'Elite ($599/month)'
-            };
-            return subscriptionMap[subscription] || 'Pro ($299/month)';
-        }
-        
-        function formatRole(role) {
-            const roleMap = {
-                'full-stack': 'Full Stack Developer',
-                'frontend': 'Frontend Developer',
-                'backend': 'Backend Developer',
-                'ui-ux': 'UI/UX Designer',
-                'devops': 'DevOps Engineer',
-                'ai-ml': 'AI/ML Specialist'
-            };
-            return roleMap[role] || 'Full Stack Developer';
-        }
-        
-        function showNotification(title, message) {
-            document.getElementById('notificationTitle').textContent = title;
-            document.getElementById('notificationMessage').textContent = message;
-            
-            successNotification.classList.remove('translate-x-full');
-            
-            setTimeout(() => {
-                successNotification.classList.add('translate-x-full');
-            }, 3000);
-        }
-        
-        function copyToClipboard(elementId) {
-            const element = document.getElementById(elementId);
-            if (!element) return;
-            
-            const text = element.value;
-            navigator.clipboard.writeText(text).then(() => {
-                showNotification('Copied!', 'API key copied to clipboard.');
-            }).catch(err => {
-                showNotification('Error', 'Failed to copy to clipboard.');
-            });
-        }
-        
-        // Project Functions
-        function selectDeveloper(devId) {
-            showNotification('Success', `Developer selected! Our team will connect you shortly.`);
-        }
-        
-        function claimProject(projectId) {
-            if (!currentUser) {
-                showNotification('Error', 'Please login to claim projects.');
-                showAuthModal('login');
-                return;
-            }
-            
-            showNotification('Success', `Project claimed successfully! You will be contacted by our team shortly.`);
-        }
-        
-        function refreshMarketplace() {
-            loadProjectsMarketplace();
-            showNotification('Info', 'Marketplace refreshed with latest projects.');
-        }
-        
-        function showSecuritySettings() {
-            showNotification('Info', 'Security settings would open here in a full implementation.');
-        }
-        
-        // Add smooth scroll for anchor links on landing page
-        document.addEventListener('click', function(e) {
-            if (e.target.matches('a[href^="#"]') && currentPage === 'landing') {
-                e.preventDefault();
-                const targetId = e.target.getAttribute('href');
-                if (targetId === '#') return;
-                
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                    window.scrollTo({
-                        top: targetElement.offsetTop - 100,
-                        behavior: 'smooth'
-                    });
-                }
-            }
-        });
-        
-        // Close modals when clicking outside
-        authModal.addEventListener('click', function(event) {
-            if (event.target === authModal) {
-                closeAuthModal();
-            }
-        });
-        
-        profileModal.addEventListener('click', function(event) {
-            if (event.target === profileModal) {
-                closeProfileModal();
-            }
-        });
-        
-        // Prevent form submission on Enter key in certain inputs
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && e.target.type !== 'textarea' && e.target.tagName !== 'BUTTON') {
-                e.preventDefault();
-            }
         });
     </script>
 </body>
